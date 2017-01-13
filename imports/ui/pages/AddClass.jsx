@@ -4,7 +4,7 @@ import React from 'react';
 import moment from 'moment';
 import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
-import { NooraClass } from '../../api/collections/classes.coffee';
+import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
 
 var AddClassPage = React.createClass({
