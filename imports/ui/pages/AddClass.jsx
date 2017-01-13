@@ -70,6 +70,8 @@ var AddClassPage = React.createClass({
           <Form.Input
             type='number'
             key= 'total_patients'
+            label= 'Total Patients'
+            type= 'number'
             placeholder="Total Patients"
             value={ this.state.nooraClass.total_patients }
             onChange={ this._handleChange("total_patients") }
@@ -77,6 +79,8 @@ var AddClassPage = React.createClass({
           <Form.Input
             type='number'
             key= 'total_family_members'
+            label= 'Total Family Members'
+            type= 'number'
             placeholder="Total Family Members"
             value={ this.state.nooraClass.total_family_members }
             onChange={ this._handleChange("total_family_members") }

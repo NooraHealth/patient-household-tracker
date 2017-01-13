@@ -6,7 +6,6 @@ import React from 'react';
 var Input = React.createClass({
 
   propTypes: {
-    value: React.PropTypes.string,
     icon: React.PropTypes.string,
     onChange: React.PropTypes.func
   },
@@ -29,7 +28,7 @@ var Input = React.createClass({
     var { title, icon, value, onChange, ...inputProps } = this.props;
     return (
       <div className="ui fluid left icon input" >
-        <i className={ icon }></i>
+        { this.getInputPrefix() }
         <input
           { ...inputProps }
           value={ value }
@@ -37,7 +36,20 @@ var Input = React.createClass({
         />
       </div>
     );
+  },
+
+  getInputPrefix() {
+    if( this.props.icon ){
+      return <i className={ icon }></i>;
+    } else {
+      return (
+        <div className="ui label">
+            { this.props.label }
+        </div>
+      )
+    }
   }
+
 });
 
 export { Input };
