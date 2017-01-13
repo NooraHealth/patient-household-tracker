@@ -7,6 +7,7 @@ import { MainLayout } from '../../ui/layout.jsx';
 import { HomePage } from '../../ui/pages/Home.jsx';
 import { SelectFacilityContainer } from '../../ui/containers/SelectFacilityContainer.jsx';
 import { AddClassContainer } from '../../ui/containers/AddClassContainer.jsx';
+import { AddAttendeesContainer } from '../../ui/containers/AddAttendeesContainer.jsx';
 import { BackButton } from '../../ui/components/Headers/BackButton.jsx';
 
 FlowRouter.route('/', {
@@ -24,6 +25,18 @@ FlowRouter.route('/addClass', {
       nav_components: <BackButton key='back_button'/>,
       content: <AddClassContainer
         key='add_class_page'
+        />
+    });
+  }
+});
+
+FlowRouter.route('/addAttendees', {
+  name: "addAttendees",
+  action: function( params ){
+    mount( MainLayout, {
+      nav_components: <BackButton key='back_button'/>,
+      content: <AddAttendeesContainer
+        key='add_attendees_page'
         />
     });
   }

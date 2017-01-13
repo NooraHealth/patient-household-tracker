@@ -5,3 +5,4 @@
 require '../imports/api/immutables/NooraClass.coffee';
 
 Meteor.startup ()->
+  console.log process.env.MONGO_URL

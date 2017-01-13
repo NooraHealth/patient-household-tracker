@@ -36,6 +36,17 @@ ClassesSchema = new SimpleSchema
   end_time:
     type: String
     defaultValue: ""
+  "attendees.$.name":
+    type: String
+  "attendees.$.is_patient":
+    type: Boolean
+  "attendees.$.language":
+    type: String
+  "attendees.$.phone_1":
+    type: String
+  "attendees.$.phone_2":
+    type: String
+    optional: true
 
 Classes.attachSchema ClassesSchema
 

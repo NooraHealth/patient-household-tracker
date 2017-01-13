@@ -16,7 +16,8 @@ BaseNooraClass = Immutable.Record {
   educators: [],
   facility_salesforce_id: '',
   record_salesforce_id: '',
-  facility_name: ''
+  facility_name: '',
+  attendees: []
 }
 
 class NooraClass extends BaseNooraClass
