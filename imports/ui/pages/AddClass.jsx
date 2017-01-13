@@ -5,6 +5,7 @@ import moment from 'moment';
 import Timepicker from 'rc-time-picker';
 import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
+import { Educators } from '../../api/collections/educators.coffee';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
 import DatePicker from 'react-datepicker';
@@ -14,6 +15,7 @@ var AddClassPage = React.createClass({
   propTypes: {
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
+    availableEducators: React.PropTypes.array,
     locations: React.PropTypes.array
   },
 
@@ -44,6 +46,7 @@ var AddClassPage = React.createClass({
   },
 
   render() {
+
     let submitText = "SAVE CLASS";
     if( this.state.loading )
       submitText = "...loading..."
@@ -51,12 +54,20 @@ var AddClassPage = React.createClass({
         return { title: location };
     });
     let dateOfClass = moment( this.state.nooraClass.date )
-    let today = moment().format("YYYY-MM-DD")
-    if( this.state.nooraClass.start_time ){
-      console.log("Making the starttime");
-      let startTime = moment( today+ "T"+ this.state.nooraClass.start_time )
-    }
-    // let endTime = moment( this.state.nooraClass.end_time )
+    let educatorOptions = this.props.availableEducators.map((educator)=> {
+        return {
+          value: educator.uniqueId,
+          name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
+        }
+    });
+
+    let selectedEducators = this.state.nooraClass.educators.map((uniqueId)=> {
+        const educator = Educators.findOne({ uniqueId: uniqueId });
+        return {
+          value: uniqueId,
+          name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
+        }
+    });
 
     return (
       <div>
@@ -103,6 +114,13 @@ var AddClassPage = React.createClass({
             value= { this.state.nooraClass.end_time }
             placeholder= 'End Time'
             onChange={ this._handleChange("end_time") }
+          />
+          <Form.MultiSelectDropdown
+            options={ educatorOptions }
+            selected={ selectedEducators  }
+            label="Add Educators"
+            placeholder="Educators"
+            onChange={ this._handleChange("educators") }
           />
         </Form>
       </div>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Input } from '../Input.jsx';
 import { Search } from '../Search.jsx';
+import { MultiSelectDropdown } from '../MultiSelectDropdown.jsx';
 
 var Form = React.createClass({
   propTypes: {
@@ -39,5 +40,6 @@ var Form = React.createClass({
 
 Form.Input = Input;
 Form.Search = Search;
+Form.MultiSelectDropdown = MultiSelectDropdown;
 
 export { Form };

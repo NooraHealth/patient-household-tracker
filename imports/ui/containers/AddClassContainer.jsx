@@ -10,6 +10,10 @@ export default AddClassContainer = createContainer(( params ) => {
   /* TODO: this will eventually be published by facility. Rm autopublish */
   var classes_handle = Meteor.subscribe("classes.all");
 
+  this._getAvailableEducators = function( facilityName ){
+    return Educators.find({ facility_name: facilityName }).fetch();
+  };
+
   this._getClassLocations = function( classes ) {
     const locations = classes.map( function( nooraClass ) {
       return nooraClass.location;
@@ -27,6 +31,7 @@ export default AddClassContainer = createContainer(( params ) => {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     locations: _getClassLocations( Classes.find({ facility_name: AppConfig.getFacilityName() }).fetch() ),
     nooraClass: new NooraClass(),
+    availableEducators: _getAvailableEducators( AppConfig.getFacilityName() ),
     currentFacilityName: AppConfig.getFacilityName()
   };
 }, AddClassPage);

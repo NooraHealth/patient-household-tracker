@@ -8,6 +8,9 @@ ClassesSchema = new SimpleSchema
   location:
     type: String
     defaultValue: ""
+  educators:
+    type: [String]
+    defaultValue: ""
   total_patients:
     type: Number
     defaultValue: ""

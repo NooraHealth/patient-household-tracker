@@ -13,6 +13,7 @@ BaseNooraClass = Immutable.Record {
   end_time: null,
   total_patients: 0,
   total_family_members: 0,
+  educators: [],
   facility_salesforce_id: '',
   record_salesforce_id: '',
   facility_name: ''
