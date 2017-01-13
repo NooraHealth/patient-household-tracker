@@ -1,5 +1,6 @@
 
 Immutable = require 'immutable'
+moment = require 'moment'
 { Facilities } = require '../collections/facilities.coffee'
 { Classes } = require '../collections/classes.coffee'
 { ClassesSchema } = require '../collections/classes.coffee'
@@ -7,6 +8,7 @@ Immutable = require 'immutable'
 BaseNooraClass = Immutable.Record {
   location: '',
   name: '',
+  date: moment().format("YYYY-MM-DD"),
   facility_salesforce_id: '',
   record_salesforce_id: '',
   facility_name: ''

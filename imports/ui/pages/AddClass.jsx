@@ -6,6 +6,7 @@ import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
+import DatePicker from 'react-datepicker';
 
 var AddClassPage = React.createClass({
 
@@ -46,6 +47,7 @@ var AddClassPage = React.createClass({
     const source = this.props.locations.map( function(location){
         return { title: location };
     });
+    let dateOfClass = moment( this.state.nooraClass.date )
 
     return (
       <div>
@@ -59,6 +61,12 @@ var AddClassPage = React.createClass({
             onChange={ this._handleChange("location") }
             source={ source }
           />
+          <DatePicker
+            className="right floated"
+            selected= { dateOfClass }
+            onChange={ this._onDateChange  }
+            dateFormat="DD/MM/YYYY"
+            />
         </Form>
       </div>
     )
@@ -102,9 +110,15 @@ var AddClassPage = React.createClass({
 
   _handleChange(field) {
     return (value) => {
+      console.log("Setting " + field + " to "  );
+      console.log(value);
       const nooraClass = this.state.nooraClass.set(field, value);
       this.setState({ nooraClass: nooraClass })
     }
+  },
+
+  _onDateChange( value ){
+    this._handleChange("date")(value.format("YYYY-MM-DD"));
   },
 
   _saveClass(nooraClass) {

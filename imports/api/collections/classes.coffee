@@ -8,11 +8,9 @@ ClassesSchema = new SimpleSchema
   location:
     type: String
     defaultValue: ""
-    optional: true
   facility_salesforce_id:
     type: String
     defaultValue: ""
-    optional: true
   record_salesforce_id:
     type: String
     defaultValue: ""
@@ -20,7 +18,9 @@ ClassesSchema = new SimpleSchema
   facility_name:
     type: String
     defaultValue: ""
-    optional: true
+  date:
+    type: String
+    defaultValue: ""
 
 Classes.attachSchema ClassesSchema
 
