@@ -8,6 +8,12 @@ ClassesSchema = new SimpleSchema
   location:
     type: String
     defaultValue: ""
+  total_patients:
+    type: Number
+    defaultValue: ""
+  total_family_members:
+    type: Number
+    defaultValue: ""
   facility_salesforce_id:
     type: String
     defaultValue: ""

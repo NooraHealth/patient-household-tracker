@@ -67,6 +67,20 @@ var AddClassPage = React.createClass({
             onChange={ this._onDateChange  }
             dateFormat="DD/MM/YYYY"
             />
+          <Form.Input
+            type='number'
+            key= 'total_patients'
+            placeholder="Total Patients"
+            value={ this.state.nooraClass.total_patients }
+            onChange={ this._handleChange("total_patients") }
+          />
+          <Form.Input
+            type='number'
+            key= 'total_family_members'
+            placeholder="Total Family Members"
+            value={ this.state.nooraClass.total_family_members }
+            onChange={ this._handleChange("total_family_members") }
+          />
         </Form>
       </div>
     )
@@ -110,8 +124,6 @@ var AddClassPage = React.createClass({
 
   _handleChange(field) {
     return (value) => {
-      console.log("Setting " + field + " to "  );
-      console.log(value);
       const nooraClass = this.state.nooraClass.set(field, value);
       this.setState({ nooraClass: nooraClass })
     }
@@ -130,7 +142,7 @@ var AddClassPage = React.createClass({
     };
 
     const onSaveSuccess = function( nooraClass ){
-      const text = "Name: "  + nooraClass.name;
+      const text = nooraClass.name;
       that._clearForm();
       showPopup({
         type: "success",
