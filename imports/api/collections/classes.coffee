@@ -27,6 +27,12 @@ ClassesSchema = new SimpleSchema
   date:
     type: String
     defaultValue: ""
+  start_time:
+    type: String
+    defaultValue: ""
+  end_time:
+    type: String
+    defaultValue: ""
 
 Classes.attachSchema ClassesSchema
 

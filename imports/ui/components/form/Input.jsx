@@ -41,12 +41,16 @@ var Input = React.createClass({
   getInputPrefix() {
     if( this.props.icon ){
       return <i className={ icon }></i>;
-    } else {
+    }
+
+    if( this.props.label ){
       return (
         <div className="ui label">
             { this.props.label }
         </div>
       )
+    } else {
+      return <div></div>
     }
   }
 

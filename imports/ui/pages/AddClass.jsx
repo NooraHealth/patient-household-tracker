@@ -2,6 +2,7 @@
 
 import React from 'react';
 import moment from 'moment';
+import Timepicker from 'rc-time-picker';
 import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
@@ -29,7 +30,9 @@ var AddClassPage = React.createClass({
     const nooraClass = this.props.nooraClass.set("facility_name", this.props.currentFacilityName);
     return {
       loading: false,
-      nooraClass: nooraClass
+      nooraClass: nooraClass,
+      startTime: null,
+      endTime: null
     }
   },
 
@@ -48,6 +51,12 @@ var AddClassPage = React.createClass({
         return { title: location };
     });
     let dateOfClass = moment( this.state.nooraClass.date )
+    let today = moment().format("YYYY-MM-DD")
+    if( this.state.nooraClass.start_time ){
+      console.log("Making the starttime");
+      let startTime = moment( today+ "T"+ this.state.nooraClass.start_time )
+    }
+    // let endTime = moment( this.state.nooraClass.end_time )
 
     return (
       <div>
@@ -84,6 +93,16 @@ var AddClassPage = React.createClass({
             placeholder="Total Family Members"
             value={ this.state.nooraClass.total_family_members }
             onChange={ this._handleChange("total_family_members") }
+          />
+          <Timepicker
+            value= { this.state.nooraClass.start_time }
+            placeholder= 'Start Time'
+            onChange={ this._handleChange("start_time") }
+          />
+          <Timepicker
+            value= { this.state.nooraClass.end_time }
+            placeholder= 'End Time'
+            onChange={ this._handleChange("end_time") }
           />
         </Form>
       </div>

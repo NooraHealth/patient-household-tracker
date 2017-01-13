@@ -9,6 +9,8 @@ BaseNooraClass = Immutable.Record {
   location: '',
   name: '',
   date: moment().format("YYYY-MM-DD"),
+  start_time: null,
+  end_time: null,
   total_patients: 0,
   total_family_members: 0,
   facility_salesforce_id: '',
@@ -27,6 +29,8 @@ class NooraClass extends BaseNooraClass
   save: ->
     nooraClass = this
     nooraClass = nooraClass.setClassName()
+    nooraClass = nooraClass.set "start_time", nooraClass.start_time.format("HH:mm")
+    nooraClass = nooraClass.set "end_time", nooraClass.end_time.format("HH:mm")
     console.log nooraClass.toJS()
     return new Promise ( resolve, reject )->
       Meteor.call "nooraClass.insert", nooraClass.toJS(), ( error, results )->
