@@ -39,14 +39,10 @@ var Search = React.createClass({
   },
 
   componentDidUpdate( prevProps, prevState ) {
-    console.log("Component updated!!");
-    console.log(prevProps.value);
-    console.log(this.props.value);
     const shouldUpdateSearch = this.props.source !== null &&
                         prevProps.source !== null &&
                         JSON.stringify( this.props.source ) !== JSON.stringify(prevProps.source);
     if(shouldUpdateSearch){
-      console.log("initializing the search");
       this._initializeSearch()
     }
   },
@@ -74,7 +70,6 @@ var Search = React.createClass({
   },
 
   handleChange( onChange, e ){
-    console.log("HANDLING CHANGE");
     if(e.target && e.target.value !== undefined ) {
       onChange(e.target.value);
     }
@@ -86,7 +81,6 @@ var Search = React.createClass({
 
   render(){
     var { label, icon, value, onChange, source, loading, ...inputProps } = this.props;
-    console.log("Rendering value " + value);
     const getInputClasses = function() {
       const defaultClasses = "ui fluid left ";
       const type = (icon)? "icon": "labeled";
