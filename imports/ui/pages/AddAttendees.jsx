@@ -112,7 +112,7 @@ var AddAttendeesPage = React.createClass({
       <div className="fields">
         <Form.Input
           key= 'name'
-          label= "Name" 
+          label= "Name"
           value={ name }
           onChange={ this._handleChange("total_patients") }
         />
