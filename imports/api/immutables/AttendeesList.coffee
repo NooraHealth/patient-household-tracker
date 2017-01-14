@@ -7,7 +7,7 @@ moment = require 'moment'
 
 BaseAttendeesList = Immutable.Record {
   class_name: '',
-  num_attendees: 0,
+  num_attendees: 3,
   attendees: Immutable.List()
 }
 

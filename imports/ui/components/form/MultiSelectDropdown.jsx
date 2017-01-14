@@ -54,8 +54,8 @@ var MultiSelectDropdown = React.createClass({
     });
 
     return (
-      <div>
-        <div className="ui sub header">{ this.props.label }</div>
+      <div className="field">
+        <label>{ this.props.label }</label>
         <select
           className="ui fluid multiple search normal selection dropdown"
           ref={ (elem)=> this.dropdown = elem }

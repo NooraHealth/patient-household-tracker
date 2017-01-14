@@ -5,6 +5,7 @@ import React from 'react';
 import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
 import { Educators } from '../../api/collections/educators.coffee';
+import { Classes } from '../../api/collections/classes.coffee';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
 import DatePicker from 'react-datepicker';
@@ -29,7 +30,7 @@ var AddAttendeesPage = React.createClass({
   getInitialState() {
     return {
       loading: false,
-      classSelected: false,
+      classSelected: null,
       attendees: this.props.attendees
     }
   },
@@ -56,7 +57,6 @@ var AddAttendeesPage = React.createClass({
             type='number'
             key= 'total_number_attended'
             label="Total Number Attended"
-            placeholder="Total Number Attended"
             value={ this.state.attendees.num_attendees }
             onChange={ this._handleChange("num_attendees") }
           />
@@ -70,30 +70,80 @@ var AddAttendeesPage = React.createClass({
     var rows = [];
     for (var i = 0; i < this.state.attendees.num_attendees; i++) {
       let key = "attendee" + i;
+      console.log(key);
       rows.push(
-        <div key={ key } className="row">{ this.renderSingleRow(this.state.attendees[i]) }</div>
+        <div key={ key }>{ this.renderSingleRow(this.state.attendees[i], i) }</div>
       );
     }
-
+    const educatorsList = this.state.classSelected.educators.map(function( uniqueId ){
+      let doc = Educators.findOne({ uniqueId: uniqueId });
+      return (
+        <div className="ui blue label">
+          { doc.first_name } { doc.last_name }
+          <div className="detail"> { doc.uniqueId } </div>
+        </div>
+      )
+    });
     return (
       <div>
-        <Form onSubmit={ this._registerAttendees } submitButtonContent={ submitText } disabled={ this.state.loading } >
-          <div className="ui grid"> { rows } </div>
-        </Form>
+      <Form onSubmit={ this._registerAttendees } submitButtonContent={ submitText } disabled={ this.state.loading } >
+        <div className="fields">
+          <div className="field">
+            <div className="ui yellow label">
+              { this.props.currentFacilityName }
+              <div className="detail">{ this.state.classSelected.location } </div>
+            </div>
+          </div>
+          <div className="field"> { educatorsList } </div>
+        </div>
+
+        { rows }
+      </Form>
       </div>
     )
   },
 
-  renderSingleRow( attendee ){
+  renderSingleRow( attendee, index ){
     const name = ( attendee )? attendee.name: '';
+    const phone1 = ( attendee )? attendee.phone1: '';
+    const patientAttended = ( attendee )? attendee.patient_attended: 'false';
+    const numCaregivers = ( attendee )? attendee.num_caregivers_attended: '';
     return (
-      <Form.Input
-        key= 'name'
-        className="two wide column"
-        placeholder="Name"
-        value={ name }
-        onChange={ this._handleChange("total_patients") }
-      />
+      <div className="fields">
+        <Form.Input
+          key= 'name'
+          label= "Name" 
+          value={ name }
+          onChange={ this._handleChange("total_patients") }
+        />
+        <Form.Input
+          type='tel'
+          key= 'phone_1'
+          label="Phone One"
+          value={ phone1 }
+          onChange={ this._handleChange("phone") }
+        />
+        <Form.Input
+          type='tel'
+          key= 'phone_2'
+          label="Phone Two"
+          value={ phone1 }
+          onChange={ this._handleChange("phone_2") }
+        />
+        <Form.Input
+          type='number'
+          key= 'num_caregivers'
+          label="# Caregivers Attended"
+          value={ numCaregivers }
+          onChange={ this._handleChange("num_caregivers_attended") }
+        />
+        <Form.Checkbox
+          key= 'checkbox'
+          label="Patient Attended?"
+          value={ patientAttended }
+          onChange={ this._handleChange("patient_attended") }
+        />
+      </div>
     )
   },
 
@@ -107,7 +157,8 @@ var AddAttendeesPage = React.createClass({
   },
 
   _onSelectClass(){
-    this.setState({ classSelected: true });
+    const selected = Classes.findOne({ name: this.state.attendees.class_name });
+    this.setState({ classSelected: selected });
   },
 
   _registerAttendees(){

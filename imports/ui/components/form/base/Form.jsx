@@ -3,6 +3,7 @@
 import React from 'react';
 import { Input } from '../Input.jsx';
 import { Search } from '../Search.jsx';
+import { Checkbox } from '../Checkbox.jsx';
 import { MultiSelectDropdown } from '../MultiSelectDropdown.jsx';
 
 var Form = React.createClass({
@@ -25,13 +26,9 @@ var Form = React.createClass({
   render(){
     let onSubmit = this.props.onSubmit;
     let submitButtonContent = this.props.submitButtonContent;
-    let children = React.Children.map( this.props.children, function( child ){
-      return <div className="field"> {child} </div>
-    });
-
     return (
       <div className="ui form">
-        { children }
+        { this.props.children }
         <p><button type="submit" key='submitbutton' className="ui fluid blue button" onClick={ onSubmit } disabled={ this.props.disabled }>{ this.props.submitButtonContent }</button></p>
       </div>
     )
@@ -40,6 +37,7 @@ var Form = React.createClass({
 
 Form.Input = Input;
 Form.Search = Search;
+Form.Checkbox = Checkbox;
 Form.MultiSelectDropdown = MultiSelectDropdown;
 
 export { Form };

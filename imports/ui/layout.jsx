@@ -9,7 +9,7 @@ var MainLayout = React.createClass({
         <div className="ui fixed inverted menu">
           <NavBar children={ this.props.nav_components }></NavBar>
         </div>
-        <div id="body" className="ui main text container">
+        <div id="body" className="ui main container extra-large-container">
           { this.props.content }
         </div>
       </div>

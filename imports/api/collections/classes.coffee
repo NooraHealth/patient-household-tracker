@@ -38,10 +38,12 @@ ClassesSchema = new SimpleSchema
     defaultValue: ""
   "attendees.$.name":
     type: String
-  "attendees.$.is_patient":
+  "attendees.$.patient_attended":
     type: Boolean
   "attendees.$.language":
     type: String
+  "attendees.$.num_caregivers_attended":
+    type: Number
   "attendees.$.phone_1":
     type: String
   "attendees.$.phone_2":

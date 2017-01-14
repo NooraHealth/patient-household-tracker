@@ -98,24 +98,26 @@ var Search = React.createClass({
       }
     }
     return (
-      <div
-        className="ui search"
-        ref={ (search)=> this.search = search }
-        >
-        <div className={ getInputClasses() }>
-          { getInputPrefix() }
-          <input
-            { ...inputProps }
-            className="prompt"
-            type="text"
-            value={ value }
-            onBlur={ this.handleClick.bind(this, onChange) }
-            onFocus={ this.handleFocus }
-            onChange={ this.handleChange.bind(this, onChange) }
-            ref={ (input) => this.input = input }
-            />
+      <div className="field">
+        <div
+          className="ui search"
+          ref={ (search)=> this.search = search }
+          >
+          <div className={ getInputClasses() }>
+            { getInputPrefix() }
+            <input
+              { ...inputProps }
+              className="prompt"
+              type="text"
+              value={ value }
+              onBlur={ this.handleClick.bind(this, onChange) }
+              onFocus={ this.handleFocus }
+              onChange={ this.handleChange.bind(this, onChange) }
+              ref={ (input) => this.input = input }
+              />
+          </div>
+          <div className="results" ref={(results)=> this.results = results}></div>
         </div>
-        <div className="results" ref={(results)=> this.results = results}></div>
       </div>
     );
   }

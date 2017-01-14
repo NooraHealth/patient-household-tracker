@@ -41,9 +41,11 @@ var Checkbox = React.createClass({
   render(){
     var { label, onChange, ...inputProps } = this.props;
     return (
-      <div className="ui left floated checkbox" ref={ (checkbox)=> this.checkbox = checkbox }>
-        <input type="checkbox" name="activation"/>
+      <div className="field">
         <label>{ label }</label>
+        <div className="ui checkbox" ref={ (checkbox)=> this.checkbox = checkbox }>
+          <input type="checkbox" name="activation"/>
+        </div>
       </div>
     );
   }

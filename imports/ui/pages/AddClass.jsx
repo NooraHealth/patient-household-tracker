@@ -81,40 +81,55 @@ var AddClassPage = React.createClass({
             onChange={ this._handleChange("location") }
             source={ source }
           />
-          <DatePicker
-            className="right floated"
-            selected= { dateOfClass }
-            onChange={ this._onDateChange  }
-            dateFormat="DD/MM/YYYY"
+          <div className="fields">
+            <Form.Input
+              type='number'
+              key= 'total_patients'
+              label= 'Total Patients'
+              type= 'number'
+              placeholder="Total Patients"
+              value={ this.state.nooraClass.total_patients }
+              onChange={ this._handleChange("total_patients") }
             />
-          <Form.Input
-            type='number'
-            key= 'total_patients'
-            label= 'Total Patients'
-            type= 'number'
-            placeholder="Total Patients"
-            value={ this.state.nooraClass.total_patients }
-            onChange={ this._handleChange("total_patients") }
-          />
-          <Form.Input
-            type='number'
-            key= 'total_family_members'
-            label= 'Total Family Members'
-            type= 'number'
-            placeholder="Total Family Members"
-            value={ this.state.nooraClass.total_family_members }
-            onChange={ this._handleChange("total_family_members") }
-          />
-          <Timepicker
-            value= { this.state.nooraClass.start_time }
-            placeholder= 'Start Time'
-            onChange={ this._handleChange("start_time") }
-          />
-          <Timepicker
-            value= { this.state.nooraClass.end_time }
-            placeholder= 'End Time'
-            onChange={ this._handleChange("end_time") }
-          />
+            <Form.Input
+              type='number'
+              key= 'total_family_members'
+              label= 'Total Family Members'
+              type= 'number'
+              placeholder="Total Family Members"
+              value={ this.state.nooraClass.total_family_members }
+              onChange={ this._handleChange("total_family_members") }
+            />
+          </div>
+
+          <div className="fields">
+            <div className="field">
+              <label> Date of Class </label>
+              <DatePicker
+                className="right floated"
+                selected= { dateOfClass }
+                onChange={ this._onDateChange  }
+                dateFormat="DD/MM/YYYY"
+                />
+            </div>
+
+            <div className="field">
+              <label> Start Time </label>
+              <Timepicker
+                value= { this.state.nooraClass.start_time }
+                placeholder= 'Start Time'
+                onChange={ this._handleChange("start_time") }
+              />
+            </div>
+            <div className="field">
+              <label> End Time </label>
+              <Timepicker
+                value= { this.state.nooraClass.end_time }
+                placeholder= 'End Time'
+                onChange={ this._handleChange("end_time") }
+              />
+            </div>
+          </div>
           <Form.MultiSelectDropdown
             options={ educatorOptions }
             selected={ selectedEducators  }
