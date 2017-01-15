@@ -1,12 +1,12 @@
 
 import { createContainer } from 'meteor/react-meteor-data';
-import { AddAttendeesPage } from '../pages/AddAttendees.jsx';
+import { SelectClassPage } from '../pages/SelectClass.jsx';
 import { Classes } from '../../api/collections/classes.coffee';
-import { AttendeesList } from '../../api/immutables/AttendeesList.coffee';
 import { AppConfig } from '../../api/AppConfig.coffee';
 
-export default AddAttendeesContainer = createContainer(( params ) => {
+export default SelectClassContainer = createContainer(( params ) => {
   /* TODO: this will eventually be published by facility. Rm autopublish */
+  console.log("CONTAINER");
   var classes_handle = Meteor.subscribe("classes.all");
   var educators_handle = Meteor.subscribe("educators.all");
 
@@ -17,9 +17,8 @@ export default AddAttendeesContainer = createContainer(( params ) => {
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     classes: _getClasses( AppConfig.getFacilityName() ),
-    attendees: new AttendeesList(),
     currentFacilityName: AppConfig.getFacilityName()
   };
-}, AddAttendeesPage);
+}, SelectClassPage);
 
-export { AddAttendeesContainer };
+export { SelectClassContainer };

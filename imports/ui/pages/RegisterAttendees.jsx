@@ -22,7 +22,6 @@ var AddAttendeesPage = React.createClass({
     return {
       currentFacilityName: "",
       classes: [],
-      attendees: null,
       loading: true
     }
   },
@@ -30,8 +29,8 @@ var AddAttendeesPage = React.createClass({
   getInitialState() {
     return {
       loading: false,
-      classSelected: null,
-      attendees: this.props.attendees
+      nooraClass: null,
+      classSelected: false
     }
   },
 
@@ -49,15 +48,15 @@ var AddAttendeesPage = React.createClass({
             key= 'class_name'
             placeholder="Select Class"
             icon="search icon"
-            value={ this.state.attendees.class_name }
-            onChange={ this._handleChange("class_name") }
+            value={ this.state.nooraClass.name }
+            onChange={ this._handleChange("name") }
             source={ classOptions }
           />
           <Form.Input
             type='number'
             key= 'total_number_attended'
             label="Total Number Attended"
-            value={ this.state.attendees.num_attendees }
+            value={ this.state.nooraClass.num_attendees }
             onChange={ this._handleChange("num_attendees") }
           />
         </Form>
@@ -164,13 +163,14 @@ var AddAttendeesPage = React.createClass({
   },
 
   _onSelectClass(){
-    const selected = Classes.findOne({ name: this.state.attendees.class_name });
-    this.setState({ classSelected: selected });
+    const doc = Classes.findOne({ name: this.state.nooraClass.name });
+    const selected = new NooraClass(doc);
+    this.setState({ nooraClass: selected, classSelected: true });
   },
 
   _handleChange(field) {
     return (value) => {
-      const attendees = this.state.attendees.set(field, value);
+      const attendees = this.state.nooraClass.set(field, value);
       this.setState({ attendees: attendees })
     }
   },

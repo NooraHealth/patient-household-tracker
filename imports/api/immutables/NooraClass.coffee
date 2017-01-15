@@ -17,6 +17,7 @@ BaseNooraClass = Immutable.Record {
   facility_salesforce_id: '',
   record_salesforce_id: '',
   facility_name: '',
+  num_attendees: '',
   attendees: Immutable.List()
 }
 

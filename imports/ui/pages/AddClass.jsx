@@ -53,22 +53,21 @@ var AddClassPage = React.createClass({
     const source = this.props.locations.map( function(location){
         return { title: location };
     });
+
     const getHour = function( time ) {
       return (time)? time.substr(0, 2) : 0;
     }
     const getMinute = function( time ) {
       return (time)? time.substr(3, 2) : 0;
     }
-    console.log(this.state.nooraClass.start_time);
-    console.log(getHour(this.state.nooraClass.start_time));
-    console.log(getMinute(this.state.nooraClass.start_time));
-    let dateOfClass = moment( this.state.nooraClass.date )
     let startTime = moment([2016, 1, 1])
     .add( getHour(this.state.nooraClass.start_time), "hours" )
     .add( getMinute(this.state.nooraClass.start_time), "minutes" );
     let endTime = moment([2016, 1, 1])
     .add( getHour(this.state.nooraClass.end_time), "hours" )
     .add( getMinute(this.state.nooraClass.end_time), "minutes" );
+
+    let dateOfClass = moment( this.state.nooraClass.date )
 
     let educatorOptions = this.props.availableEducators.map((educator)=> {
         return {
