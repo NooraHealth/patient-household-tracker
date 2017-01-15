@@ -34,7 +34,6 @@ FlowRouter.route('/addClass', {
 FlowRouter.route('/selectClass', {
   name: "selectClass",
   action: function( params ){
-    console.log("SELKECT CLASS");
     mount( MainLayout, {
       nav_components: <BackButton key='back_button'/>,
       content: <SelectClassContainer
@@ -47,9 +46,11 @@ FlowRouter.route('/selectClass', {
 FlowRouter.route('/registerAttendees/:className', {
   name: "registerAttendees",
   action: function( params, queryParams ){
+    console.log("Route");
+    console.log(RegisterAttendeesContainer);
     mount( MainLayout, {
       nav_components: <BackButton key='back_button'/>,
-      content: <RegisterAttendeesPage
+      content: <RegisterAttendeesContainer
         key='register_attendees_page'
         className={ params.className }
         numAttendees={ queryParams.numAttendees }

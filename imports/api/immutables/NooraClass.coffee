@@ -17,7 +17,6 @@ BaseNooraClass = Immutable.Record {
   facility_salesforce_id: '',
   record_salesforce_id: '',
   facility_name: '',
-  num_attendees: '',
   attendees: Immutable.List()
 }
 
@@ -62,6 +61,7 @@ if Meteor.isServer
       nooraClass.facility_salesforce_id = facility.salesforce_id
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);
+      console.log nooraClass
       return Classes.insert nooraClass
 
 module.exports.NooraClass = NooraClass

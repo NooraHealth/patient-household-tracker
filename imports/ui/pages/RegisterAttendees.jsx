@@ -10,96 +10,31 @@ import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
 import DatePicker from 'react-datepicker';
 
-var AddAttendeesPage = React.createClass({
+var RegisterAttendeesPage = React.createClass({
 
   propTypes: {
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
-    classes: React.PropTypes.array
+    numAttendees: React.PropTypes.number,
+    classDoc: React.PropTypes.object
   },
 
   defaultProps() {
     return {
       currentFacilityName: "",
-      classes: [],
-      loading: true
+      numAttendees: 0,
+      loading: true,
+      classDoc: {}
     }
   },
 
   getInitialState() {
+    let nooraClass = new NooraClass(this.props.classDoc);
+    console.log(nooraClass);
     return {
       loading: false,
-      nooraClass: null,
-      classSelected: false
+      nooraClass: nooraClass
     }
-  },
-
-  renderSelectClassForm(){
-    const submitText = "SELECT CLASS"
-    const classOptions = this.props.classes.map(function(nooraClass) {
-      return { title: nooraClass.name };
-    });
-
-    return (
-      <div>
-        <Form onSubmit={ this._onSelectClass } submitButtonContent={ submitText } disabled={ this.state.loading } >
-          <SelectFacilityContainer/>
-          <Form.Search
-            key= 'class_name'
-            placeholder="Select Class"
-            icon="search icon"
-            value={ this.state.nooraClass.name }
-            onChange={ this._handleChange("name") }
-            source={ classOptions }
-          />
-          <Form.Input
-            type='number'
-            key= 'total_number_attended'
-            label="Total Number Attended"
-            value={ this.state.nooraClass.num_attendees }
-            onChange={ this._handleChange("num_attendees") }
-          />
-        </Form>
-      </div>
-    )
-  },
-
-  renderRegisterAttendeesForm(){
-    const submitText = "REGISTER ATTENDEES";
-    var rows = [];
-    for (var i = 0; i < this.state.attendees.num_attendees; i++) {
-      let key = "attendee" + i;
-      console.log(key);
-      rows.push(
-        <div key={ key }>{ this.renderSingleRow(this.state.attendees[i], i) }</div>
-      );
-    }
-    const educatorsList = this.state.classSelected.educators.map(function( uniqueId ){
-      let doc = Educators.findOne({ uniqueId: uniqueId });
-      return (
-        <div className="ui blue label" key={ "educator--" + uniqueId}>
-          { doc.first_name } { doc.last_name }
-          <div className="detail"> { doc.uniqueId } </div>
-        </div>
-      )
-    });
-    return (
-      <div>
-      <Form onSubmit={ this._registerAttendees } submitButtonContent={ submitText } disabled={ this.state.loading } >
-        <div className="fields">
-          <div className="field">
-            <div className="ui yellow label">
-              { this.props.currentFacilityName }
-              <div className="detail">{ this.state.classSelected.location } </div>
-            </div>
-          </div>
-          <div className="field"> { educatorsList } </div>
-        </div>
-
-        { rows }
-      </Form>
-      </div>
-    )
   },
 
   renderSingleRow( attendee, i ){
@@ -154,18 +89,47 @@ var AddAttendeesPage = React.createClass({
   },
 
   render() {
-    if( this.state.classSelected ){
-      return ( <div> { this.renderRegisterAttendeesForm() } </div>);
-    } else {
-      console.log("Rendering class form");
-      return ( <div> { this.renderSelectClassForm() } </div>);
+    const submitText = "REGISTER ATTENDEES";
+    var rows = [];
+    for (var i = 0; i < this.props.numAttendees; i++) {
+      let key = "attendee" + i;
+      console.log(key);
+      rows.push(
+        <div key={ key }>{ this.renderSingleRow(this.state.nooraClass.attendees[i], i) }</div>
+      );
     }
+    const educatorsList = this.state.nooraClass.educators.map(function( uniqueId ){
+      let doc = Educators.findOne({ uniqueId: uniqueId });
+      return (
+        <div className="ui blue label" key={ "educator--" + uniqueId}>
+          { doc.first_name } { doc.last_name }
+          <div className="detail"> { doc.uniqueId } </div>
+        </div>
+      )
+    });
+    return (
+      <div>
+      <Form onSubmit={ this._registerAttendees } submitButtonContent={ submitText } disabled={ this.state.loading } >
+        <div className="fields">
+          <div className="field">
+            <div className="ui yellow label">
+              { this.props.currentFacilityName }
+              <div className="detail">{ this.state.nooraClass.location } </div>
+            </div>
+          </div>
+          <div className="field"> { educatorsList } </div>
+        </div>
+
+        { rows }
+      </Form>
+      </div>
+    )
   },
 
   _onSelectClass(){
     const doc = Classes.findOne({ name: this.state.nooraClass.name });
     const selected = new NooraClass(doc);
-    this.setState({ nooraClass: selected, classSelected: true });
+    this.setState({ nooraClass: selected, nooraClass: true });
   },
 
   _handleChange(field) {
@@ -206,4 +170,4 @@ var AddAttendeesPage = React.createClass({
 
 });
 
-export { AddAttendeesPage };
+export { RegisterAttendeesPage };

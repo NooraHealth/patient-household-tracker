@@ -27,7 +27,7 @@ var SelectClassPage = React.createClass({
     return {
       loading: false,
       class_name: '',
-      num_attendees: 0
+      num_attendees: 4
     }
   },
 
