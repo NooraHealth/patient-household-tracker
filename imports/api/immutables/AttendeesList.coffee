@@ -3,7 +3,8 @@ Immutable = require 'immutable'
 moment = require 'moment'
 { Facilities } = require '../collections/facilities.coffee'
 { Classes } = require '../collections/classes.coffee'
-{ ClassesSchema } = require '../collections/classes.coffee'
+{ ListOfAttendees } = require '../collections/list_of_attendees.coffee'
+{ ListOfAttendeesSchema } = require '../collections/list_of_attendees.coffee'
 
 BaseAttendeesList = Immutable.Record {
   class_name: '',
@@ -28,28 +29,23 @@ class AttendeesList extends BaseAttendeesList
         if error
           reject error
         else
-          console.log results
-          console.log Classes.find({}).fetch()
-          AttendeesListDoc = Classes.findOne { _id: results._id }
-          Meteor.call "syncWithSalesforce", AttendeesListDoc
-          resolve AttendeesList
+          classDoc = Classes.findOne { _id: results._id }
+          Meteor.call "syncWithSalesforce", classDoc
+          resolve classDoc
 
 if Meteor.isServer
   { SalesforceInterface } = require '../salesforce/SalesforceInterface.coffee'
 
   Meteor.methods
-    "syncWithSalesforce": ( AttendeesList )->
+    "syncWithSalesforce": ( listOfAttendees )->
       console.log AttendeesList
       console.log "THIS IS WHERE YOU EXPORT TO SALESFORCE"
 
-    "AttendeesList.insert": ( AttendeesList )->
-      console.log "Saving this AttendeesList"
-      facility = Facilities.findOne { name: AttendeesList.facility_name }
-      if not facility
-        throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
-      AttendeesList.facility_salesforce_id = facility.salesforce_id
-      ClassesSchema.clean(AttendeesList)
-      ClassesSchema.validate(AttendeesList);
-      return Classes.insert AttendeesList
+    "AttendeesList.insert": ( listOfAttendees )->
+      if listOfAttendees.num_attendees != listOfAttendees.attendees.lenth()
+        throw new Meteor.Error 'invalid attendees', "Number of attendees must be #{ listOfAttendees.num_attendees }"
+      ListOfAttendeesSchema.clean(listOfAttendees)
+      ListOfAttendeesSchema.validate(listOfAttendees);
+      return listOfAttendees.insert listOfAttendees
 
 module.exports.AttendeesList = AttendeesList

@@ -17,12 +17,14 @@ BaseNooraClass = Immutable.Record {
   facility_salesforce_id: '',
   record_salesforce_id: '',
   facility_name: '',
-  attendees: []
+  attendees: Immutable.List()
 }
 
 class NooraClass extends BaseNooraClass
   constructor: ( properties )->
-    super Object.assign({}, properties);
+    super Object.assign({}, properties, {
+      attendees: Immutable.List properties && properties.condition_operations
+    });
 
   setClassName: ->
     console.log "Setting class name"
@@ -31,8 +33,6 @@ class NooraClass extends BaseNooraClass
   save: ->
     nooraClass = this
     nooraClass = nooraClass.setClassName()
-    nooraClass = nooraClass.set "start_time", nooraClass.start_time.format("HH:mm")
-    nooraClass = nooraClass.set "end_time", nooraClass.end_time.format("HH:mm")
     console.log nooraClass.toJS()
     return new Promise ( resolve, reject )->
       Meteor.call "nooraClass.insert", nooraClass.toJS(), ( error, results )->

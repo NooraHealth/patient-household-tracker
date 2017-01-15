@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react'
 import Immutable from 'immutable';
 
-var MultiSelectDropdown = React.createClass({
+var Dropdown = React.createClass({
 
   propTypes: {
     placeholder: React.PropTypes.string,
@@ -53,13 +53,20 @@ var MultiSelectDropdown = React.createClass({
       return <option value={option.value} key={key}>{option.name}</option>
     });
 
+    const getClasses = ()=> {
+      if (this.props.multiple) {
+        return "ui fluid multiple search normal selection dropdown";
+      } else {
+        return "ui fluid search normal selection dropdown";
+      }
+
+    }
     return (
       <div className="field">
         <label>{ this.props.label }</label>
         <select
-          className="ui fluid multiple search normal selection dropdown"
+          className={ getClasses() }
           ref={ (elem)=> this.dropdown = elem }
-          multiple=""
           >
           <option value="">{ this.props.placeholder }</option>
           { optionElems }
@@ -74,4 +81,4 @@ var MultiSelectDropdown = React.createClass({
 
 });
 
-export { MultiSelectDropdown };
+export { Dropdown };

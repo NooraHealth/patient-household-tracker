@@ -78,7 +78,7 @@ var AddAttendeesPage = React.createClass({
     const educatorsList = this.state.classSelected.educators.map(function( uniqueId ){
       let doc = Educators.findOne({ uniqueId: uniqueId });
       return (
-        <div className="ui blue label">
+        <div className="ui blue label" key={ "educator--" + uniqueId}>
           { doc.first_name } { doc.last_name }
           <div className="detail"> { doc.uniqueId } </div>
         </div>
@@ -103,42 +103,49 @@ var AddAttendeesPage = React.createClass({
     )
   },
 
-  renderSingleRow( attendee, index ){
+  renderSingleRow( attendee, i ){
     const name = ( attendee )? attendee.name: '';
     const phone1 = ( attendee )? attendee.phone1: '';
     const patientAttended = ( attendee )? attendee.patient_attended: 'false';
     const numCaregivers = ( attendee )? attendee.num_caregivers_attended: '';
+    const language = ( attendee )? attendee.language: '';
+    const selectedLanguage = { name: language, value: language };
+    const languageOptions = [
+      { name: "English", value: "English" },
+      { name: "Hindi", value: "Hindi" },
+      { name: "Kannada", value: "Kannada" },
+    ];
     return (
       <div className="fields">
         <Form.Input
-          key= 'name'
+          key= { 'name--' + i }
           label= "Name"
           value={ name }
           onChange={ this._handleChange("total_patients") }
         />
         <Form.Input
           type='tel'
-          key= 'phone_1'
+          key= { 'phone1--' + i }
           label="Phone One"
           value={ phone1 }
           onChange={ this._handleChange("phone") }
         />
         <Form.Input
           type='tel'
-          key= 'phone_2'
+          key= { 'phone2--' + i }
           label="Phone Two"
           value={ phone1 }
           onChange={ this._handleChange("phone_2") }
         />
         <Form.Input
           type='number'
-          key= 'num_caregivers'
+          key= { 'num-caregivers--' + i }
           label="# Caregivers Attended"
           value={ numCaregivers }
           onChange={ this._handleChange("num_caregivers_attended") }
         />
         <Form.Checkbox
-          key= 'checkbox'
+          key= { 'patient-attended--' + i }
           label="Patient Attended?"
           value={ patientAttended }
           onChange={ this._handleChange("patient_attended") }
@@ -161,15 +168,40 @@ var AddAttendeesPage = React.createClass({
     this.setState({ classSelected: selected });
   },
 
-  _registerAttendees(){
-    console.log("REGISTERING");
-  },
-
   _handleChange(field) {
     return (value) => {
       const attendees = this.state.attendees.set(field, value);
       this.setState({ attendees: attendees })
     }
+  },
+
+  _registerAttendees() {
+    const that = this;
+    const showPopup = ( options, callback )=> {
+      Meteor.setTimeout( ()=> {
+        swal(options, callback);
+      }, 100 );
+    };
+
+    const onSaveSuccess = function( listOfAttendees ){
+      const text = listOfAttendees.class_name + ": " +listOfAttendees.num_attendees + " attendees";
+      showPopup({
+        type: "success",
+        title: "Attendees Saved Successfully",
+        text: text
+      });
+    };
+
+    const onSaveError = function(error) {
+      /* TODO: render according to whether loading */
+      that.setState({ loading: false });
+      showPopup({
+        type: "error",
+        text: error.message,
+        title: "Error inserting registering attendees"
+      });
+    }
+    this.state.attendees.save().then( results => onSaveSuccess(results), error => onSaveError(error))
   }
 
 });

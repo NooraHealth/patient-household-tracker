@@ -4,7 +4,7 @@ import React from 'react';
 import { Input } from '../Input.jsx';
 import { Search } from '../Search.jsx';
 import { Checkbox } from '../Checkbox.jsx';
-import { MultiSelectDropdown } from '../MultiSelectDropdown.jsx';
+import { Dropdown } from '../Dropdown.jsx';
 
 var Form = React.createClass({
   propTypes: {
@@ -38,6 +38,6 @@ var Form = React.createClass({
 Form.Input = Input;
 Form.Search = Search;
 Form.Checkbox = Checkbox;
-Form.MultiSelectDropdown = MultiSelectDropdown;
+Form.Dropdown = Dropdown;
 
 export { Form };

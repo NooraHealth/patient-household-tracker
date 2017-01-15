@@ -53,7 +53,23 @@ var AddClassPage = React.createClass({
     const source = this.props.locations.map( function(location){
         return { title: location };
     });
+    const getHour = function( time ) {
+      return (time)? time.substr(0, 2) : 0;
+    }
+    const getMinute = function( time ) {
+      return (time)? time.substr(3, 2) : 0;
+    }
+    console.log(this.state.nooraClass.start_time);
+    console.log(getHour(this.state.nooraClass.start_time));
+    console.log(getMinute(this.state.nooraClass.start_time));
     let dateOfClass = moment( this.state.nooraClass.date )
+    let startTime = moment([2016, 1, 1])
+    .add( getHour(this.state.nooraClass.start_time), "hours" )
+    .add( getMinute(this.state.nooraClass.start_time), "minutes" );
+    let endTime = moment([2016, 1, 1])
+    .add( getHour(this.state.nooraClass.end_time), "hours" )
+    .add( getMinute(this.state.nooraClass.end_time), "minutes" );
+
     let educatorOptions = this.props.availableEducators.map((educator)=> {
         return {
           value: educator.uniqueId,
@@ -116,26 +132,29 @@ var AddClassPage = React.createClass({
             <div className="field">
               <label> Start Time </label>
               <Timepicker
-                value= { this.state.nooraClass.start_time }
+                value= { startTime }
                 placeholder= 'Start Time'
-                onChange={ this._handleChange("start_time") }
+                showSecond={ false }
+                onChange={ this._onTimeChange.bind(this, "start_time") }
               />
             </div>
             <div className="field">
               <label> End Time </label>
               <Timepicker
-                value= { this.state.nooraClass.end_time }
+                value= { endTime }
                 placeholder= 'End Time'
-                onChange={ this._handleChange("end_time") }
+                showSecond={ false }
+                onChange={ this._onTimeChange.bind(this, "end_time") }
               />
             </div>
           </div>
-          <Form.MultiSelectDropdown
+          <Form.Dropdown
             options={ educatorOptions }
             selected={ selectedEducators  }
+            multiple={ true }
             label="Add Educators"
             placeholder="Educators"
-            onChange={ this._handleChange("educators") }
+            onChange={ this._handleChange( "educators") }
           />
         </Form>
       </div>
@@ -189,7 +208,11 @@ var AddClassPage = React.createClass({
     this._handleChange("date")(value.format("YYYY-MM-DD"));
   },
 
-  _saveClass(nooraClass) {
+  _onTimeChange( field, value ){
+    this._handleChange(field)(value.format("HH:mm"));
+  },
+
+  _saveClass() {
     const that = this;
     const showPopup = ( options, callback )=> {
       Meteor.setTimeout( ()=> {
