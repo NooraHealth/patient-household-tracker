@@ -11,12 +11,16 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
   var educators_handle = Meteor.subscribe("educators.all");
 
   var classDoc = Classes.findOne({ name: params.className });
-  console.log(classDoc);
+  var attendees = new Array(params.numAttendees);
+  attendees.fill({});
+  if( classDoc ){
+    classDoc.attendees = attendees;
+  }
 
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     classDoc: classDoc,
-    numAttendees: parseInt(params.numAttendees),
+    numAttendees: params.numAttendees,
     currentFacilityName: AppConfig.getFacilityName()
   };
 }, RegisterAttendeesPage);

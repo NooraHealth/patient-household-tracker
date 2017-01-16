@@ -30,7 +30,6 @@ var RegisterAttendeesPage = React.createClass({
 
   getInitialState() {
     let nooraClass = new NooraClass(this.props.classDoc);
-    console.log(nooraClass);
     return {
       loading: false,
       nooraClass: nooraClass
@@ -55,34 +54,34 @@ var RegisterAttendeesPage = React.createClass({
           key= { 'name--' + i }
           label= "Name"
           value={ name }
-          onChange={ this._handleChange("total_patients") }
+          onChange={ this._handleChange(i, "name") }
         />
         <Form.Input
           type='tel'
           key= { 'phone1--' + i }
           label="Phone One"
           value={ phone1 }
-          onChange={ this._handleChange("phone") }
+          onChange={ this._handleChange(i, "phone_1") }
         />
         <Form.Input
           type='tel'
           key= { 'phone2--' + i }
           label="Phone Two"
           value={ phone1 }
-          onChange={ this._handleChange("phone_2") }
+          onChange={ this._handleChange(i, "phone_2") }
         />
         <Form.Input
           type='number'
           key= { 'num-caregivers--' + i }
           label="# Caregivers Attended"
           value={ numCaregivers }
-          onChange={ this._handleChange("num_caregivers_attended") }
+          onChange={ this._handleChange(i, "num_caregivers_attended") }
         />
         <Form.Checkbox
           key= { 'patient-attended--' + i }
           label="Patient Attended?"
           value={ patientAttended }
-          onChange={ this._handleChange("patient_attended") }
+          onChange={ this._handleChange(i, "patient_attended") }
         />
       </div>
     )
@@ -93,9 +92,9 @@ var RegisterAttendeesPage = React.createClass({
     var rows = [];
     for (var i = 0; i < this.props.numAttendees; i++) {
       let key = "attendee" + i;
-      console.log(key);
+      let attendee = this.state.nooraClass.attendees.get(i);
       rows.push(
-        <div key={ key }>{ this.renderSingleRow(this.state.nooraClass.attendees[i], i) }</div>
+        <div key={ key }>{ this.renderSingleRow(attendee , i) }</div>
       );
     }
     const educatorsList = this.state.nooraClass.educators.map(function( uniqueId ){
@@ -126,16 +125,16 @@ var RegisterAttendeesPage = React.createClass({
     )
   },
 
-  _onSelectClass(){
-    const doc = Classes.findOne({ name: this.state.nooraClass.name });
-    const selected = new NooraClass(doc);
-    this.setState({ nooraClass: selected, nooraClass: true });
-  },
-
-  _handleChange(field) {
+  _handleChange(index, field) {
     return (value) => {
-      const attendees = this.state.nooraClass.set(field, value);
-      this.setState({ attendees: attendees })
+      let newValues = this.state.nooraClass.attendees.get(index);
+      if( !newValues ){
+        newValues = {};
+      }
+      newValues[field] = value;
+      const list = this.state.nooraClass.attendees.set(index, newValues);
+      const nooraClass = this.state.nooraClass.set("attendees", list);
+      this.setState({ nooraClass: nooraClass })
     }
   },
 
@@ -147,8 +146,8 @@ var RegisterAttendeesPage = React.createClass({
       }, 100 );
     };
 
-    const onSaveSuccess = function( listOfAttendees ){
-      const text = listOfAttendees.class_name + ": " +listOfAttendees.num_attendees + " attendees";
+    const onSaveSuccess = function( nooraClass ){
+      const text = nooraClass.name + ": " + nooraClass.attendees.size() + " attendees";
       showPopup({
         type: "success",
         title: "Attendees Saved Successfully",
@@ -165,7 +164,7 @@ var RegisterAttendeesPage = React.createClass({
         title: "Error inserting registering attendees"
       });
     }
-    this.state.attendees.save().then( results => onSaveSuccess(results), error => onSaveError(error))
+    this.state.nooraClass.save().then( results => onSaveSuccess(results), error => onSaveError(error))
   }
 
 });

@@ -5,7 +5,6 @@ var Checkbox = React.createClass({
 
   propTypes: {
     label: React.PropTypes.string,
-    value: React.PropTypes.string,
     onChange: React.PropTypes.func,
     checked: React.PropTypes.bool
   },
@@ -13,7 +12,6 @@ var Checkbox = React.createClass({
   defaultProps(){
     return {
       label: "",
-      value: "",
       onChange: function(){},
       checked: false
     }
@@ -24,7 +22,7 @@ var Checkbox = React.createClass({
     $(this.checkbox).checkbox({
       onChange: ()=> {
         const checked = $(this.checkbox).checkbox("is checked");
-        onChange( this.props.value, checked );
+        onChange( checked );
       }
     });
     let behavior = ( this.props.checked )? "set checked": "set unchecked";

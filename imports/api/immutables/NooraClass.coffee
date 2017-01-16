@@ -27,20 +27,19 @@ class NooraClass extends BaseNooraClass
     });
 
   setClassName: ->
-    console.log "Setting class name"
     return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }  "
 
   save: ->
     nooraClass = this
-    nooraClass = nooraClass.setClassName()
+    if nooraClass.name == ''
+      nooraClass = nooraClass.setClassName()
+    console.log "TO JS"
     console.log nooraClass.toJS()
     return new Promise ( resolve, reject )->
-      Meteor.call "nooraClass.insert", nooraClass.toJS(), ( error, results )->
+      Meteor.call "nooraClass.upsert", nooraClass.toJS(), ( error, results )->
         if error
           reject error
         else
-          console.log results
-          console.log Classes.find({}).fetch()
           nooraClassDoc = Classes.findOne { _id: results._id }
           Meteor.call "syncWithSalesforce", nooraClassDoc
           resolve nooraClass
@@ -53,7 +52,7 @@ if Meteor.isServer
       console.log nooraClass
       console.log "THIS IS WHERE YOU EXPORT TO SALESFORCE"
 
-    "nooraClass.insert": ( nooraClass )->
+    "nooraClass.upsert": ( nooraClass )->
       console.log "Saving this nooraClass"
       facility = Facilities.findOne { name: nooraClass.facility_name }
       if not facility
@@ -62,6 +61,6 @@ if Meteor.isServer
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);
       console.log nooraClass
-      return Classes.insert nooraClass
+      return Classes.upsert { name: nooraClass.name }, { $set: nooraClass }
 
 module.exports.NooraClass = NooraClass
