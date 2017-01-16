@@ -2,7 +2,6 @@
 { Facilities } = require "../collections/facilities.coffee"
 { Classes } = require "../collections/classes.coffee"
 { getDateTime } = require "../utils.coffee"
-moment = require 'moment'
 
 class SalesforceInterface
 
@@ -11,6 +10,8 @@ class SalesforceInterface
 
   exportClass: ( nooraClass )->
     return new Promise (resolve, reject)->
+      console.log "The noora class to sync"
+      console.log nooraClass
       facility = Facilities.findOne {
         salesforce_id: nooraClass.facility_salesforce_id
       }
@@ -31,10 +32,11 @@ class SalesforceInterface
           console.log err
           reject(err)
         else
-          salesforceId = ret.id
-          if educator.contact_salesforce_id? and educator.contact_salesforce_id != ""
-            salesforceId = educator.contact_salesforce_id
-          resolve(salesforceId)
+          console.log "ret"
+          console.log ret.id
+          resolve(ret.id)
 
       #insert into the Salesforce database
-      Salesforce.sobject("Attendance_Report__c").insert salesforceContact, callback
+      Salesforce.sobject("Attendance_Report__c").insert salesforceObj, callback
+
+module.exports.SalesforceInterface = SalesforceInterface

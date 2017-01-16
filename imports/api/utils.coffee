@@ -1,4 +1,6 @@
 
+moment   = require 'moment'
+
 getDateTime = ( date, time )->
   return moment(date)
     .add(getHour(time), "hours")

@@ -23,12 +23,13 @@ BaseNooraClass = Immutable.Record {
 
 class NooraClass extends BaseNooraClass
   constructor: ( properties )->
+    console.log moment
     super Object.assign({}, properties, {
       attendees: Immutable.List properties && properties.condition_operations
     });
 
   setClassName: ->
-    return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }  "
+    return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }, #{this.start_time} to #{this.end_time}"
 
   save: ->
     nooraClass = this
@@ -41,9 +42,11 @@ class NooraClass extends BaseNooraClass
         if error
           reject error
         else
-          nooraClassDoc = Classes.findOne { _id: results._id }
-          console.log "This is the nooraClassDoc"
+          console.log nooraClass.name
+          nooraClassDoc = Classes.findOne({ name: nooraClass.name })
+          console.log "The doc"
           console.log nooraClassDoc
+          console.log Classes.find({}).fetch()
           Meteor.call "syncWithSalesforce", nooraClassDoc
           resolve nooraClass
 
@@ -54,16 +57,23 @@ if Meteor.isServer
     "syncWithSalesforce": ( classDoc )->
       console.log classDoc
       console.log "THIS IS WHERE YOU EXPORT TO SALESFORCE"
+      toSalesforce = new SalesforceInterface()
+      promise = toSalesforce.exportClass(classDoc);
+      promise.then( (id)->
+        console.log "Success exporting!! "
+        console.log id
+      , (err)->
+        console.log "There was an error syncing with salesforce"
+        console.log err
+      )
 
     "nooraClass.upsert": ( nooraClass )->
-      console.log "Saving this nooraClass"
       facility = Facilities.findOne { name: nooraClass.facility_name }
       if not facility
         throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
       nooraClass.facility_salesforce_id = facility.salesforce_id
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);
-      console.log nooraClass
       return Classes.upsert { name: nooraClass.name }, { $set: nooraClass }
 
 module.exports.NooraClass = NooraClass

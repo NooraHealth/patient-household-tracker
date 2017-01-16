@@ -5,6 +5,7 @@ ClassesSchema = new SimpleSchema
   name:
     type: String
     defaultValue: ""
+    unique: true
   location:
     type: String
     defaultValue: ""
