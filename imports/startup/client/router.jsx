@@ -12,6 +12,7 @@ import { RegisterAttendeesContainer } from '../../ui/containers/RegisterAttendee
 import { BackButton } from '../../ui/components/Headers/BackButton.jsx';
 
 FlowRouter.route('/', {
+  name: "home",
   action: function(){
     mount( MainLayout, {
       content: <HomePage key='homepage'/>

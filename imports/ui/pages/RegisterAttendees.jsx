@@ -153,6 +153,7 @@ var RegisterAttendeesPage = React.createClass({
         title: "Attendees Saved Successfully",
         text: text
       });
+      FlowRouter.go("home");
     };
 
     const onSaveError = function(error) {
