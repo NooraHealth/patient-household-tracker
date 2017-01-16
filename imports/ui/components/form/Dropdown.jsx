@@ -49,7 +49,7 @@ var Dropdown = React.createClass({
 
   render(){
     const optionElems = this.props.options.map(function(option, i){
-      const key = "operation-" + option.value;
+      const key = "option-" + option.value;
       return <option value={option.value} key={key}>{option.name}</option>
     });
 

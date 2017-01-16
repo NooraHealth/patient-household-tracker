@@ -17,6 +17,9 @@ ClassesSchema = new SimpleSchema
   total_family_members:
     type: Number
     defaultValue: ""
+  condition_operation_salesforce_id:
+    type: String
+    defaultValue: ""
   facility_salesforce_id:
     type: String
     defaultValue: ""
@@ -40,12 +43,15 @@ ClassesSchema = new SimpleSchema
     type: String
   "attendees.$.patient_attended":
     type: Boolean
+    optional: true
   "attendees.$.language":
     type: String
+    optional:true
   "attendees.$.num_caregivers_attended":
     type: Number
   "attendees.$.phone_1":
     type: String
+    optional:true
   "attendees.$.phone_2":
     type: String
     optional: true

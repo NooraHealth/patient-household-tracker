@@ -6,7 +6,10 @@ import Timepicker from 'rc-time-picker';
 import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
 import { Educators } from '../../api/collections/educators.coffee';
+import { ConditionOperations } from '../../api/collections/condition_operations.coffee';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
+import { getHour } from '../../api/utils.coffee';
+import { getMinute } from '../../api/utils.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
 import DatePicker from 'react-datepicker';
 
@@ -16,6 +19,7 @@ var AddClassPage = React.createClass({
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
     availableEducators: React.PropTypes.array,
+    conditionOperations: React.PropTypes.array,
     locations: React.PropTypes.array
   },
 
@@ -23,6 +27,8 @@ var AddClassPage = React.createClass({
     return {
       currentFacilityName: "",
       locations: [],
+      conditionOperations: [],
+      availableEducators: [],
       nooraClass: null,
       loading: true
     }
@@ -32,9 +38,7 @@ var AddClassPage = React.createClass({
     const nooraClass = this.props.nooraClass.set("facility_name", this.props.currentFacilityName);
     return {
       loading: false,
-      nooraClass: nooraClass,
-      startTime: null,
-      endTime: null
+      nooraClass: nooraClass
     }
   },
 
@@ -46,7 +50,6 @@ var AddClassPage = React.createClass({
   },
 
   render() {
-
     let submitText = "SAVE CLASS";
     if( this.state.loading )
       submitText = "...loading..."
@@ -54,27 +57,33 @@ var AddClassPage = React.createClass({
         return { title: location };
     });
 
-    const getHour = function( time ) {
-      return (time)? time.substr(0, 2) : 0;
-    }
-    const getMinute = function( time ) {
-      return (time)? time.substr(3, 2) : 0;
-    }
     let startTime = moment([2016, 1, 1])
-    .add( getHour(this.state.nooraClass.start_time), "hours" )
-    .add( getMinute(this.state.nooraClass.start_time), "minutes" );
+      .add( getHour(this.state.nooraClass.start_time), "hours" )
+      .add( getMinute(this.state.nooraClass.start_time), "minutes" );
     let endTime = moment([2016, 1, 1])
-    .add( getHour(this.state.nooraClass.end_time), "hours" )
-    .add( getMinute(this.state.nooraClass.end_time), "minutes" );
+      .add( getHour(this.state.nooraClass.end_time), "hours" )
+      .add( getMinute(this.state.nooraClass.end_time), "minutes" );
 
     let dateOfClass = moment( this.state.nooraClass.date )
-
     let educatorOptions = this.props.availableEducators.map((educator)=> {
         return {
           value: educator.uniqueId,
           name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
         }
     });
+
+    let operationOptions = this.props.conditionOperations.map(( op )=> {
+        return {
+          value: op.salesforce_id,
+          name: op.name
+        }
+    });
+
+    const operation = ConditionOperations.findOne({ salesforce_id: this.state.nooraClass.condition_operation_salesforce_id });
+    let selectedOption = {
+      name: (operation)? operation.name: "",
+      value: (operation)? operation.salesforce_id: ""
+    }
 
     let selectedEducators = this.state.nooraClass.educators.map((uniqueId)=> {
         const educator = Educators.findOne({ uniqueId: uniqueId });
@@ -88,6 +97,12 @@ var AddClassPage = React.createClass({
       <div>
         <Form onSubmit={ this._onSubmit } submitButtonContent={ submitText } disabled={ this.state.loading } >
           <SelectFacilityContainer/>
+          <Form.Dropdown
+            options={ operationOptions }
+            selected={ [selectedOption] }
+            label="Condition Operation"
+            onChange={ this._handleChange( "condition_operation_salesforce_id") }
+          />
           <Form.Search
             key= 'class_location'
             placeholder="Location"

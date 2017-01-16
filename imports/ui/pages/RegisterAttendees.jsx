@@ -147,7 +147,7 @@ var RegisterAttendeesPage = React.createClass({
     };
 
     const onSaveSuccess = function( nooraClass ){
-      const text = nooraClass.name + ": " + nooraClass.attendees.size() + " attendees";
+      const text = nooraClass.name + ": " + nooraClass.attendees.size + " attendees";
       showPopup({
         type: "success",
         title: "Attendees Saved Successfully",

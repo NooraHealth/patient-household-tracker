@@ -15,6 +15,7 @@ BaseNooraClass = Immutable.Record {
   total_family_members: 0,
   educators: [],
   facility_salesforce_id: '',
+  condition_operation_salesforce_id: '',
   record_salesforce_id: '',
   facility_name: '',
   attendees: Immutable.List()
@@ -41,6 +42,8 @@ class NooraClass extends BaseNooraClass
           reject error
         else
           nooraClassDoc = Classes.findOne { _id: results._id }
+          console.log "This is the nooraClassDoc"
+          console.log nooraClassDoc
           Meteor.call "syncWithSalesforce", nooraClassDoc
           resolve nooraClass
 
@@ -48,8 +51,8 @@ if Meteor.isServer
   { SalesforceInterface } = require '../salesforce/SalesforceInterface.coffee'
 
   Meteor.methods
-    "syncWithSalesforce": ( nooraClass )->
-      console.log nooraClass
+    "syncWithSalesforce": ( classDoc )->
+      console.log classDoc
       console.log "THIS IS WHERE YOU EXPORT TO SALESFORCE"
 
     "nooraClass.upsert": ( nooraClass )->
