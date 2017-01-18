@@ -60,6 +60,13 @@ var RegisterAttendeesPage = React.createClass({
           value={ name }
           onChange={ this._handleChange(i, "name") }
         />
+        <Form.Dropdown
+          key= {'language-- ' + i }
+          label="Select Language"
+          onChange={ this._handleChange(i, "language") }
+          options={ languageOptions }
+          selected={ [{ value: language, name: language}] }
+        />
         <Form.Input
           type='tel'
           key= { 'phone1--' + i }
@@ -134,26 +141,13 @@ var RegisterAttendeesPage = React.createClass({
 
   _handleChange(index, field) {
     return (value) => {
-      console.log("Value " + value);
-      console.log("Index " + index);
-      console.log("Field " + field);
-      // console.log("New values");
-      // console.log(newValues);
-      console.log(this.state.nooraClass.attendees.toArray()[index]);
       let newValues = this.state.nooraClass.attendees.get(index);
-      console.log(newValues);
       if( !newValues ){
         newValues = {};
       }
       newValues[field] = value;
-      console.log(newValues);
       const list = this.state.nooraClass.attendees.set(index, newValues);
-      console.log(this.state.nooraClass.attendees.toArray()[index]);
-      console.log(this.state.nooraClass.attendees.toArray());
-      console.log("new list of attendees");
-      // console.log(list.toArray());
       const nooraClass = this.state.nooraClass.set("attendees", list);
-      console.log(nooraClass.attendees.toArray());
       this.setState({ nooraClass: nooraClass })
     }
   },

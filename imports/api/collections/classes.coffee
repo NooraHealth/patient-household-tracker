@@ -65,7 +65,6 @@ ClassesSchema = new SimpleSchema
     optional: true
   "attendees.$.language":
     type: String
-    optional:true
   "attendees.$.num_caregivers_attended":
     type: Number
   "attendees.$.phone_1":

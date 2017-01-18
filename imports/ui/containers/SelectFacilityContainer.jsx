@@ -1,6 +1,6 @@
 
 import { createContainer } from 'meteor/react-meteor-data';
-import { Search } from '../components/form/Search.jsx';
+import { Dropdown } from '../components/form/Dropdown.jsx';
 import { Facilities } from '../../api/collections/facilities.coffee';
 import { AppConfig } from '../../api/AppConfig.coffee';
 
@@ -13,23 +13,23 @@ export default SelectFacilityContainer = createContainer(() => {
     AppConfig.setFacilityName( value );
   };
 
-  this._getFacilityNames = function( facilities ) {
+  this._getFacilityOptions = function( facilities ) {
     const names= facilities.map( function( facility ){
       return facility.name;
     });
     return names.map( function(name){
-        return { title: name };
+        return { value: name, name: name };
     });
   };
 
   return {
     loading: ! handle.ready(),
-    source: _getFacilityNames( Facilities.find({}).fetch() ),
+    options: _getFacilityOptions( Facilities.find({}).fetch() ),
     label: "Facility",
-    value: AppConfig.getFacilityName(),
+    selected: [{ value: AppConfig.getFacilityName(), name: AppConfig.getFacilityName()}],
     placeholder: " Search Facilities",
     onChange: _onChange
   };
-}, Search);
+}, Dropdown);
 
 export { SelectFacilityContainer };

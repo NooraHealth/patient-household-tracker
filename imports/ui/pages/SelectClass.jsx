@@ -45,7 +45,7 @@ var SelectClassPage = React.createClass({
           <SelectFacilityContainer/>
           <Form.Dropdown
             key= 'class_name'
-            placeholder="Select Class"
+            label="Select Class"
             icon="search icon"
             onChange={ this._handleChange("class_name") }
             options={ classOptions }
