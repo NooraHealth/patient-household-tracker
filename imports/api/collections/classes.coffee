@@ -28,6 +28,9 @@ ClassesSchema = new SimpleSchema
   facility_name:
     type: String
     defaultValue: ""
+  date_created:
+    type: String
+    defaultValue: ""
   date:
     type: String
     defaultValue: ""

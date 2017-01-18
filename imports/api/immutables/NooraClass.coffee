@@ -9,6 +9,7 @@ BaseNooraClass = Immutable.Record {
   location: '',
   name: '',
   date: moment().format("YYYY-MM-DD"),
+  date_created: null,
   start_time: null,
   end_time: null,
   total_patients: 0,
@@ -32,7 +33,7 @@ class NooraClass extends BaseNooraClass
     return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }, #{this.start_time} to #{this.end_time}"
 
   save: ->
-    nooraClass = this
+    nooraClass = this.set("date_created", moment().toISOString());
     if nooraClass.name == ''
       nooraClass = nooraClass.setClassName()
       console.log "Saving this class"

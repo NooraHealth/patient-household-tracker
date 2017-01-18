@@ -95,8 +95,6 @@ var RegisterAttendeesPage = React.createClass({
     const submitText = "REGISTER ATTENDEES";
     const attendees = this.state.nooraClass.attendees.toArray();
     const that = this;
-    console.log("in the render");
-    console.log(attendees);
     let rows = [];
     for( var i=0; i < this.props.numAttendees; i++ ){
       let key = "attendee" + i;

@@ -33,21 +33,23 @@ var SelectClassPage = React.createClass({
 
   render() {
     const submitText = "SELECT CLASS"
+    console.log("Classes");
     const classOptions = this.props.classes.map(function(nooraClass) {
-      return { title: nooraClass.name };
+      return { value: nooraClass.name, name: nooraClass.name };
     });
+    console.log(classOptions);
 
     return (
       <div>
         <Form onSubmit={ this._onSelectClass } submitButtonContent={ submitText } disabled={ this.state.loading } >
           <SelectFacilityContainer/>
-          <Form.Search
+          <Form.Dropdown
             key= 'class_name'
             placeholder="Select Class"
             icon="search icon"
-            value={ this.state.class_name }
             onChange={ this._handleChange("class_name") }
-            source={ classOptions }
+            options={ classOptions }
+            selected={ [{ value: this.state.class_name, name: this.state.class_name}] }
           />
           <Form.Input
             type='number'
