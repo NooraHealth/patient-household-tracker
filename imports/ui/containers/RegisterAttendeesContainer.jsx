@@ -11,11 +11,6 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
   var educators_handle = Meteor.subscribe("educators.all");
 
   var classDoc = Classes.findOne({ name: params.className });
-  var attendees = new Array(params.numAttendees);
-  attendees.fill({});
-  if( classDoc ){
-    classDoc.attendees = attendees;
-  }
 
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,

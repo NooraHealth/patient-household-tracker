@@ -62,7 +62,6 @@ var SelectClassPage = React.createClass({
   },
 
   _onSelectClass(){
-    console.log(this.state);
     FlowRouter.go("registerAttendees", {
       className: this.state.class_name
     }, {

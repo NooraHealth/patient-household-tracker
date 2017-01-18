@@ -37,8 +37,12 @@ var RegisterAttendeesPage = React.createClass({
   },
 
   renderSingleRow( attendee, i ){
+    console.log("The attendee");
+    console.log(attendee);
+    console.log(i);
     const name = ( attendee )? attendee.name: '';
-    const phone1 = ( attendee )? attendee.phone1: '';
+    const phone1 = ( attendee )? attendee.phone_1: '';
+    const phone2 = ( attendee )? attendee.phone_2: '';
     const patientAttended = ( attendee )? attendee.patient_attended: 'false';
     const numCaregivers = ( attendee )? attendee.num_caregivers_attended: '';
     const language = ( attendee )? attendee.language: '';
@@ -67,7 +71,7 @@ var RegisterAttendeesPage = React.createClass({
           type='tel'
           key= { 'phone2--' + i }
           label="Phone Two"
-          value={ phone1 }
+          value={ phone2 }
           onChange={ this._handleChange(i, "phone_2") }
         />
         <Form.Input
@@ -89,18 +93,23 @@ var RegisterAttendeesPage = React.createClass({
 
   render() {
     const submitText = "REGISTER ATTENDEES";
-    var rows = [];
-    for (var i = 0; i < this.props.numAttendees; i++) {
+    const attendees = this.state.nooraClass.attendees.toArray();
+    const that = this;
+    console.log("in the render");
+    console.log(attendees);
+    let rows = [];
+    for( var i=0; i < this.props.numAttendees; i++ ){
       let key = "attendee" + i;
-      let attendee = this.state.nooraClass.attendees.get(i);
+      // let attendee = this.state.nooraClass.attendees.get(i);
       rows.push(
-        <div key={ key }>{ this.renderSingleRow(attendee , i) }</div>
+        <div key={ key }>{ that.renderSingleRow(this.state.nooraClass.attendees.get(i) , i) }</div>
       );
-    }
-    const educatorsList = this.state.nooraClass.educators.map(function( uniqueId ){
-      let doc = Educators.findOne({ uniqueId: uniqueId });
+    };
+
+    const educatorsList = this.state.nooraClass.educators.map(function( educator ){
+      let doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });
       return (
-        <div className="ui blue label" key={ "educator--" + uniqueId}>
+        <div className="ui blue label" key={ "educator--" + doc.uniqueId}>
           { doc.first_name } { doc.last_name }
           <div className="detail"> { doc.uniqueId } </div>
         </div>
@@ -127,13 +136,26 @@ var RegisterAttendeesPage = React.createClass({
 
   _handleChange(index, field) {
     return (value) => {
+      console.log("Value " + value);
+      console.log("Index " + index);
+      console.log("Field " + field);
+      // console.log("New values");
+      // console.log(newValues);
+      console.log(this.state.nooraClass.attendees.toArray()[index]);
       let newValues = this.state.nooraClass.attendees.get(index);
+      console.log(newValues);
       if( !newValues ){
         newValues = {};
       }
       newValues[field] = value;
+      console.log(newValues);
       const list = this.state.nooraClass.attendees.set(index, newValues);
+      console.log(this.state.nooraClass.attendees.toArray()[index]);
+      console.log(this.state.nooraClass.attendees.toArray());
+      console.log("new list of attendees");
+      // console.log(list.toArray());
       const nooraClass = this.state.nooraClass.set("attendees", list);
+      console.log(nooraClass.attendees.toArray());
       this.setState({ nooraClass: nooraClass })
     }
   },

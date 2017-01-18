@@ -65,12 +65,6 @@ var AddClassPage = React.createClass({
       .add( getMinute(this.state.nooraClass.end_time), "minutes" );
 
     let dateOfClass = moment( this.state.nooraClass.date )
-    let educatorOptions = this.props.availableEducators.map((educator)=> {
-        return {
-          value: educator.uniqueId,
-          name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
-        }
-    });
 
     let operationOptions = this.props.conditionOperations.map(( op )=> {
         return {
@@ -85,11 +79,19 @@ var AddClassPage = React.createClass({
       value: (operation)? operation.salesforce_id: ""
     }
 
-    let selectedEducators = this.state.nooraClass.educators.map((uniqueId)=> {
-        const educator = Educators.findOne({ uniqueId: uniqueId });
+    let educatorOptions = this.props.availableEducators.map((educator)=> {
         return {
-          value: uniqueId,
+          value: educator.contact_salesforce_id,
           name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
+        }
+    });
+
+    let selectedEducators = this.state.nooraClass.educators.toArray().map((educator)=> {
+        console.log(educator);
+        const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });
+        return {
+          value: doc.contact_salesforce_id,
+          name: doc.first_name + " " + doc.last_name + " ID: " + doc.uniqueId
         }
     });
 
@@ -168,7 +170,7 @@ var AddClassPage = React.createClass({
             multiple={ true }
             label="Add Educators"
             placeholder="Educators"
-            onChange={ this._handleChange( "educators") }
+            onChange={ this._onEducatorChange }
           />
         </Form>
       </div>
@@ -216,6 +218,14 @@ var AddClassPage = React.createClass({
       const nooraClass = this.state.nooraClass.set(field, value);
       this.setState({ nooraClass: nooraClass })
     }
+  },
+
+  _onEducatorChange( educatorSalesforceIds ){
+    var newList = Immutable.List();
+    educatorSalesforceIds.forEach(function( id ){
+      newList = newList.push({ contact_salesforce_id: id });
+    });
+    this._handleChange("educators")(newList);
   },
 
   _onDateChange( value ){

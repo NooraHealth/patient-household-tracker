@@ -9,9 +9,6 @@ ClassesSchema = new SimpleSchema
   location:
     type: String
     defaultValue: ""
-  educators:
-    type: [String]
-    defaultValue: ""
   total_patients:
     type: Number
     defaultValue: ""
@@ -24,7 +21,7 @@ ClassesSchema = new SimpleSchema
   facility_salesforce_id:
     type: String
     defaultValue: ""
-  record_salesforce_id:
+  attendance_report_salesforce_id:
     type: String
     defaultValue: ""
     optional: true
@@ -40,8 +37,26 @@ ClassesSchema = new SimpleSchema
   end_time:
     type: String
     defaultValue: ""
+  export_class_error:
+    type: Boolean
+    defaultValue: false
+    optional: true
+  export_attendees_error:
+    type: Boolean
+    defaultValue: false
+    optional: true
+  #TODO: Make all references to salesforce ids the same term
+  "educators.$.contact_salesforce_id":
+    type: String
+  "educators.$.class_educator_salesforce_id":
+    type: String
+    optional: true
   "attendees.$.name":
     type: String
+  "attendees.$.contact_salesforce_id":
+    type: String
+    defaultValue: ''
+    optional: true
   "attendees.$.patient_attended":
     type: Boolean
     optional: true

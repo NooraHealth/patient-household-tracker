@@ -13,19 +13,19 @@ BaseNooraClass = Immutable.Record {
   end_time: null,
   total_patients: 0,
   total_family_members: 0,
-  educators: [],
+  educators: Immutable.List(),
   facility_salesforce_id: '',
   condition_operation_salesforce_id: '',
-  record_salesforce_id: '',
+  attendance_report_salesforce_id: '',
   facility_name: '',
   attendees: Immutable.List()
 }
 
 class NooraClass extends BaseNooraClass
   constructor: ( properties )->
-    console.log moment
     super Object.assign({}, properties, {
-      attendees: Immutable.List properties && properties.condition_operations
+      attendees: Immutable.List properties && properties.attendees,
+      educators: Immutable.List properties && properties.educators
     });
 
   setClassName: ->
@@ -35,18 +35,14 @@ class NooraClass extends BaseNooraClass
     nooraClass = this
     if nooraClass.name == ''
       nooraClass = nooraClass.setClassName()
-    console.log "TO JS"
-    console.log nooraClass.toJS()
+      console.log "Saving this class"
+      console.log nooraClass.toJS()
     return new Promise ( resolve, reject )->
       Meteor.call "nooraClass.upsert", nooraClass.toJS(), ( error, results )->
         if error
           reject error
         else
-          console.log nooraClass.name
           nooraClassDoc = Classes.findOne({ name: nooraClass.name })
-          console.log "The doc"
-          console.log nooraClassDoc
-          console.log Classes.find({}).fetch()
           Meteor.call "syncWithSalesforce", nooraClassDoc
           resolve nooraClass
 
@@ -55,17 +51,40 @@ if Meteor.isServer
 
   Meteor.methods
     "syncWithSalesforce": ( classDoc )->
-      console.log classDoc
-      console.log "THIS IS WHERE YOU EXPORT TO SALESFORCE"
+      console.log "Syncing with salesforce"
       toSalesforce = new SalesforceInterface()
-      promise = toSalesforce.exportClass(classDoc);
-      promise.then( (id)->
-        console.log "Success exporting!! "
-        console.log id
-      , (err)->
-        console.log "There was an error syncing with salesforce"
-        console.log err
-      )
+      if classDoc.attendance_report_salesforce_id != '' and classDoc.attendees.length > 0
+        promise = toSalesforce.exportAttendees(classDoc)
+        promise.then(( attendees )->
+          console.log "Success exporting attendees"
+          classDoc.attendees = attendees
+          classDoc.export_attendees_error = false
+          Classes.update { name: classDoc.name }, {$set: classDoc }
+          console.log Classes.findOne { name: classDoc.name }
+        , ( err )->
+          Classes.update { name: classDoc.name }, {$set: { export_attendees_error: true }}
+          console.log "error exporting attendees"
+          console.log err
+        )
+      else
+        promise = toSalesforce.exportClass(classDoc);
+        promise.then( (id)->
+          console.log "Success exporting class!! "
+          classDoc.attendance_report_salesforce_id = id
+          Classes.update { name: classDoc.name }, {$set: classDoc }
+          console.log classDoc.attendance_report_salesforce_id
+          return toSalesforce.exportClassEducators(classDoc)
+        ).then(( educators )->
+          console.log "Success exporting class educator objects"
+          classDoc.educators = educators
+          classDoc.export_class_error = false
+          Classes.update { name: classDoc.name }, {$set: classDoc }
+          console.log Classes.findOne { name: classDoc.name }
+        , (err)->
+          console.log "There was an error syncing with salesforce"
+          console.log err
+          Classes.update { name: classDoc.name }, {$set: { export_class_error: true }}
+        )
 
     "nooraClass.upsert": ( nooraClass )->
       facility = Facilities.findOne { name: nooraClass.facility_name }
