@@ -55,6 +55,7 @@ class SalesforceInterface
           "HomePhone" : attendee.phone_2 or 0,
           "Patient_Attended_Class__c" : attendee.patient_attended,
           "Languages__c" : attendee.language,
+          "Diagnosis__c" : attendee.diagnosis,
           "Number_Family_Members_Attended_Class__c" : attendee.num_caregivers_attended,
           "Attendance_Report__c" : classDoc.attendance_report_salesforce_id,
           "AccountId" : facility.delivery_partner,

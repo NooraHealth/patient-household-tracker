@@ -17,7 +17,7 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
     classes.forEach( function( nooraClass ) {
       nooraClass.attendees.forEach(function(attendee){
         if(attendee.diagnosis){
-          previousDiagnoses.push(previousDiagnoses);
+          previousDiagnoses.push(attendee.diagnosis);
         }
       });
     });

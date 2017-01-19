@@ -16,7 +16,7 @@ var RegisterAttendeesPage = React.createClass({
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
     numAttendees: React.PropTypes.number,
-    diagnoses: React.PropTypes.string,
+    diagnoses: React.PropTypes.array,
     classDoc: React.PropTypes.object
   },
 
@@ -51,8 +51,6 @@ var RegisterAttendeesPage = React.createClass({
   },
 
   renderSingleRow( attendee, i ){
-    console.log("Attendee");
-    console.log(attendee);
     const name = ( attendee )? attendee.name: '';
     const phone1 = ( attendee )? attendee.phone_1: '';
     const phone2 = ( attendee )? attendee.phone_2: '';
@@ -104,7 +102,7 @@ var RegisterAttendeesPage = React.createClass({
         <Form.Search
           key= { 'diagnosis---' + i }
           label="Diagnosis"
-          onChange={ this._handleChange(i, "location") }
+          onChange={ this._handleChange(i, "diagnosis") }
           source={ diagnosisOptions }
         />
         <Form.Dropdown
