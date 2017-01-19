@@ -31,9 +31,6 @@ class SalesforceInterface
         else
           educator.class_educator_salesforce_id = ret.id
         updatedEducators.push educator
-        console.log "In the callback"
-        console.log updatedEducators.length
-        console.log updatedEducators
         if updatedEducators.length == classDoc.educators.length
           resolve updatedEducators
 

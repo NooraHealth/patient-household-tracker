@@ -48,13 +48,14 @@ var Dropdown = React.createClass({
   },
 
   render(){
-    const optionElems = this.props.options.map(function(option, i){
+    const { options, multiple, label, selected, placeholder, style } = this.props;
+    const optionElems = options.map(function(option, i){
       const key = "option-" + option.value;
       return <option value={option.value} key={key}>{option.name}</option>
     });
 
     const getClasses = ()=> {
-      if (this.props.multiple) {
+      if (multiple) {
         return "ui fluid multiple search normal selection dropdown";
       } else {
         return "ui fluid search normal selection dropdown";
@@ -62,13 +63,16 @@ var Dropdown = React.createClass({
 
     }
     return (
-      <div className="field">
-        <label>{ this.props.label }</label>
+      <div
+        style={ style }
+        className="field"
+        >
+        <label>{ label }</label>
         <select
           className={ getClasses() }
           ref={ (elem)=> this.dropdown = elem }
           >
-          <option value="">{ this.props.placeholder }</option>
+          <option value="">{ placeholder }</option>
           { optionElems }
         </select>
       </div>

@@ -82,29 +82,28 @@ var Search = React.createClass({
   render(){
     var { label, icon, value, onChange, source, loading, ...inputProps } = this.props;
     const getInputClasses = function() {
-      const defaultClasses = "ui fluid left ";
-      const type = (icon)? "icon": "labeled";
-      return defaultClasses + type + " input";
+      const defaultClasses = "ui fluid";
+      const type = (icon)? "left icon": "";
+      // return defaultClasses + type + " input";
+      return defaultClasses + type;
     }
     const getInputPrefix = function() {
       if( icon ){
         return <i className={icon}></i>;
       } else {
         return (
-          <div className="ui label">
-              { label }
-          </div>
+          <label>{ label }</label>
         )
       }
     }
     return (
       <div className="field">
+        { getInputPrefix() }
         <div
           className="ui search"
           ref={ (search)=> this.search = search }
           >
           <div className={ getInputClasses() }>
-            { getInputPrefix() }
             <input
               { ...inputProps }
               className="prompt"

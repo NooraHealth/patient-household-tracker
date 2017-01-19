@@ -19,6 +19,7 @@ BaseNooraClass = Immutable.Record {
   condition_operation_salesforce_id: '',
   attendance_report_salesforce_id: '',
   facility_name: '',
+  majority_language: '',
   attendees: Immutable.List()
 }
 

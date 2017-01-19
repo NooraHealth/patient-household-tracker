@@ -10,6 +10,9 @@ class AppConfig
     setFacilityName: ( name )->
       Session.set "current_facility_name", name
 
+    getSupportedLanguages: ->
+      return ['English', 'Kannada', 'Hindi', 'Telugu'];
+
     getFacilityName: ->
       name = Session.get "current_facility_name"
       if name == undefined

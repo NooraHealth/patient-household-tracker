@@ -16,6 +16,7 @@ var RegisterAttendeesPage = React.createClass({
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
     numAttendees: React.PropTypes.number,
+    diagnoses: React.PropTypes.string,
     classDoc: React.PropTypes.object
   },
 
@@ -29,17 +30,29 @@ var RegisterAttendeesPage = React.createClass({
   },
 
   getInitialState() {
-    let nooraClass = new NooraClass(this.props.classDoc);
+    const nooraClass = new NooraClass(this.props.classDoc);
     return {
       loading: false,
       nooraClass: nooraClass
     }
   },
 
+  componentDidMount(){
+    /* set default language for all attendees */
+    console.log(this.state.nooraClass.majority_language);
+    var list = this.state.nooraClass.attendees;
+    console.log(list);
+    var majorityLanguage = this.state.nooraClass.majority_language;
+    for(var i = 0; i < this.props.numAttendees; i++){
+      list = list.set(i, {'language': majorityLanguage});
+    }
+    const nooraClass = this.state.nooraClass.set("attendees", list);
+    this.setState({ nooraClass: nooraClass })
+  },
+
   renderSingleRow( attendee, i ){
-    console.log("The attendee");
+    console.log("Attendee");
     console.log(attendee);
-    console.log(i);
     const name = ( attendee )? attendee.name: '';
     const phone1 = ( attendee )? attendee.phone_1: '';
     const phone2 = ( attendee )? attendee.phone_2: '';
@@ -47,11 +60,12 @@ var RegisterAttendeesPage = React.createClass({
     const numCaregivers = ( attendee )? attendee.num_caregivers_attended: '';
     const language = ( attendee )? attendee.language: '';
     const selectedLanguage = { name: language, value: language };
-    const languageOptions = [
-      { name: "English", value: "English" },
-      { name: "Hindi", value: "Hindi" },
-      { name: "Kannada", value: "Kannada" },
-    ];
+    const languageOptions = this.props.supportedLanguages.map( function(language){
+        return { name: language, value: language };
+    });
+    const diagnosisOptions = this.props.diagnoses.map( function(diagnosis){
+        return { title: diagnosis };
+    });
     return (
       <div className="fields">
         <Form.Input
@@ -59,13 +73,6 @@ var RegisterAttendeesPage = React.createClass({
           label= "Name"
           value={ name }
           onChange={ this._handleChange(i, "name") }
-        />
-        <Form.Dropdown
-          key= {'language-- ' + i }
-          label="Select Language"
-          onChange={ this._handleChange(i, "language") }
-          options={ languageOptions }
-          selected={ [{ value: language, name: language}] }
         />
         <Form.Input
           type='tel'
@@ -81,6 +88,12 @@ var RegisterAttendeesPage = React.createClass({
           value={ phone2 }
           onChange={ this._handleChange(i, "phone_2") }
         />
+        <Form.Checkbox
+          key= { 'patient-attended--' + i }
+          label="Patient Attended?"
+          value={ patientAttended }
+          onChange={ this._handleChange(i, "patient_attended") }
+        />
         <Form.Input
           type='number'
           key= { 'num-caregivers--' + i }
@@ -88,11 +101,19 @@ var RegisterAttendeesPage = React.createClass({
           value={ numCaregivers }
           onChange={ this._handleChange(i, "num_caregivers_attended") }
         />
-        <Form.Checkbox
-          key= { 'patient-attended--' + i }
-          label="Patient Attended?"
-          value={ patientAttended }
-          onChange={ this._handleChange(i, "patient_attended") }
+        <Form.Search
+          key= { 'diagnosis---' + i }
+          label="Diagnosis"
+          onChange={ this._handleChange(i, "location") }
+          source={ diagnosisOptions }
+        />
+        <Form.Dropdown
+          key= {'language-- ' + i }
+          label="Language"
+          style={ { width:"200px" } }
+          onChange={ this._handleChange(i, "language") }
+          options={ languageOptions }
+          selected={ [{ value: language, name: language}] }
         />
       </div>
     )

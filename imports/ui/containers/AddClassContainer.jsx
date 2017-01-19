@@ -37,6 +37,7 @@ export default AddClassContainer = createContainer(( params ) => {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     locations: _getClassLocations( Classes.find({ facility_name: AppConfig.getFacilityName() }).fetch() ),
     nooraClass: new NooraClass(),
+    supportedLanguages: AppConfig.getSupportedLanguages(),
     availableEducators: _getAvailableEducators( AppConfig.getFacilityName() ),
     conditionOperations: _getConditionOperations( AppConfig.getFacilityName() ),
     currentFacilityName: AppConfig.getFacilityName()

@@ -95,6 +95,10 @@ var AddClassPage = React.createClass({
         }
     });
 
+    let languageOptions = this.props.supportedLanguages.map( function(language){
+        return { value: language, name: language };
+    });
+
     return (
       <div>
         <Form onSubmit={ this._onSubmit } submitButtonContent={ submitText } disabled={ this.state.loading } >
@@ -107,8 +111,7 @@ var AddClassPage = React.createClass({
           />
           <Form.Search
             key= 'class_location'
-            placeholder="Location"
-            icon="search icon"
+            label="Location"
             value={ this.state.nooraClass.location }
             onChange={ this._handleChange("location") }
             source={ source }
@@ -131,6 +134,16 @@ var AddClassPage = React.createClass({
               placeholder="Total Family Members"
               value={ this.state.nooraClass.total_family_members }
               onChange={ this._handleChange("total_family_members") }
+            />
+            <Form.Dropdown
+              key="majority_language"
+              label="Majority Language"
+              onChange={ this._handleChange("majority_language") }
+              options={ languageOptions }
+              selected={[
+                { value: this.state.nooraClass.majority_language,
+                  name: this.state.nooraClass.majority_language
+                }]}
             />
           </div>
 

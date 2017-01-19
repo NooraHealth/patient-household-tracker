@@ -9,6 +9,9 @@ ClassesSchema = new SimpleSchema
   location:
     type: String
     defaultValue: ""
+  majority_language:
+    type: String
+    defaultValue: ""
   total_patients:
     type: Number
     defaultValue: ""
@@ -65,6 +68,10 @@ ClassesSchema = new SimpleSchema
     optional: true
   "attendees.$.language":
     type: String
+  "attendees.$.diagnosis":
+    type: String
+    optional: true
+    defaultValue: null
   "attendees.$.num_caregivers_attended":
     type: Number
   "attendees.$.phone_1":

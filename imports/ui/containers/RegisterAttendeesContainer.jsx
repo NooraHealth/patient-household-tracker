@@ -12,10 +12,30 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
 
   var classDoc = Classes.findOne({ name: params.className });
 
+  this._getDiagnosisOptions = function( classes ) {
+    let previousDiagnoses = [];
+    classes.forEach( function( nooraClass ) {
+      nooraClass.attendees.forEach(function(attendee){
+        if(attendee.diagnosis){
+          previousDiagnoses.push(previousDiagnoses);
+        }
+      });
+    });
+    filtered = []
+    previousDiagnoses.forEach( function(diagnosis){
+      if( filtered.indexOf(diagnosis) == -1){
+        filtered.push(diagnosis);
+      };
+    });
+    return filtered;
+  };
+
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     classDoc: classDoc,
+    diagnoses: _getDiagnosisOptions( Classes.find({}).fetch() ),
     numAttendees: params.numAttendees,
+    supportedLanguages: AppConfig.getSupportedLanguages(),
     currentFacilityName: AppConfig.getFacilityName()
   };
 }, RegisterAttendeesPage);
