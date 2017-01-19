@@ -39,9 +39,7 @@ var RegisterAttendeesPage = React.createClass({
 
   componentDidMount(){
     /* set default language for all attendees */
-    console.log(this.state.nooraClass.majority_language);
     var list = this.state.nooraClass.attendees;
-    console.log(list);
     var majorityLanguage = this.state.nooraClass.majority_language;
     for(var i = 0; i < this.props.numAttendees; i++){
       list = list.set(i, {'language': majorityLanguage});
