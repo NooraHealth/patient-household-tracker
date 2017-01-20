@@ -13,7 +13,7 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
   var classDoc = Classes.findOne({ name: params.className });
 
   this._getDiagnosisOptions = function( classes ) {
-    let previousDiagnoses = [];
+    let previousDiagnoses = AppConfig.getBaseDiagnoses();
     classes.forEach( function( nooraClass ) {
       nooraClass.attendees.forEach(function(attendee){
         if(attendee.diagnosis){

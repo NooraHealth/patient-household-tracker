@@ -36,17 +36,18 @@ class SalesforceInterface
 
       #insert into the Salesforce database
       for educator, i in educators
-        console.log "exporting this!"
-        console.log educator
         Salesforce.sobject("Class_Educator__c").insert educator, callback.bind(this, classDoc.educators[i] )
 
-  exportAttendees: ( classDoc )->
+  exportAttendees: ( classDoc, attendees )->
     return new Promise (resolve, reject)->
+      if attendees.length is 0
+        resolve({ successful: [], errored: [] })
+
       facility = Facilities.findOne {
         salesforce_id: classDoc.facility_salesforce_id
       }
 
-      contacts = classDoc.attendees.map ( attendee )->
+      contacts = attendees.map ( attendee )->
         console.log 'the attendee'
         console.log attendee
         return {
@@ -63,20 +64,21 @@ class SalesforceInterface
       }
 
       updatedAttendees = []
+      erroredAttendees = []
       callback = Meteor.bindEnvironment ( attendee, err, ret ) ->
         if err
           console.log "Error exporting class attendees"
           console.log err
-          reject(err)
+          erroredAttendees.push(attendee)
         else
           attendee.contact_salesforce_id = ret.id
-        updatedAttendees.push attendee
-        if updatedAttendees.length == classDoc.attendees.length
-          resolve updatedAttendees
+          updatedAttendees.push attendee
+        if((erroredAttendees.length + updatedAttendees.length) == attendees.length)
+          resolve({ successful: updatedAttendees, errored: erroredAttendees} )
 
       #insert into the Salesforce database
       for contact, i in contacts
-        Salesforce.sobject("Contact").insert contact, callback.bind(this, classDoc.attendees[i] )
+        Salesforce.sobject("Contact").insert contact, callback.bind(this, attendees[i] )
 
   exportClass: ( nooraClass )->
     return new Promise (resolve, reject)->

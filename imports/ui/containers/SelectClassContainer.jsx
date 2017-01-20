@@ -10,7 +10,8 @@ export default SelectClassContainer = createContainer(( params ) => {
   var educators_handle = Meteor.subscribe("educators.all");
 
   this._getClasses = function( facilityName ){
-    return Classes.find({ facility_name: facilityName, 'attendees.0':{ $exists: false } }).fetch().reverse();
+    // return Classes.find({ facility_name: facilityName, 'attendees.0':{ $exists: false } }).fetch().reverse();
+    return Classes.find({ facility_name: facilityName }).fetch().reverse();
   };
 
   return {

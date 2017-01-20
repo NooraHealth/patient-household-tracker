@@ -2,7 +2,6 @@
 
 import React from 'react';
 import moment from 'moment';
-import Timepicker from 'rc-time-picker';
 import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
 import { Educators } from '../../api/collections/educators.coffee';
@@ -160,7 +159,7 @@ var AddClassPage = React.createClass({
 
             <div className="field">
               <label> Start Time </label>
-              <Timepicker
+              <Form.TimePicker
                 value= { startTime }
                 placeholder= 'Start Time'
                 showSecond={ false }
@@ -169,7 +168,7 @@ var AddClassPage = React.createClass({
             </div>
             <div className="field">
               <label> End Time </label>
-              <Timepicker
+              <Form.TimePicker
                 value= { endTime }
                 placeholder= 'End Time'
                 showSecond={ false }
@@ -246,7 +245,7 @@ var AddClassPage = React.createClass({
   },
 
   _onTimeChange( field, value ){
-    this._handleChange(field)(value.format("HH:mm"));
+    this._handleChange(field)(moment(value).format("HH:mm"));
   },
 
   _saveClass() {

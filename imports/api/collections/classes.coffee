@@ -57,6 +57,25 @@ ClassesSchema = new SimpleSchema
   "educators.$.class_educator_salesforce_id":
     type: String
     optional: true
+  "errored_attendees.$.name":
+    type: String
+  "errored_attendees.$.patient_attended":
+    type: Boolean
+    optional: true
+  "errored_attendees.$.language":
+    type: String
+  "errored_attendees.$.diagnosis":
+    type: String
+    optional: true
+    defaultValue: null
+  "errored_attendees.$.num_caregivers_attended":
+    type: Number
+  "errored_attendees.$.phone_1":
+    type: String
+    optional:true
+  "errored_attendees.$.phone_2":
+    type: String
+    optional: true
   "attendees.$.name":
     type: String
   "attendees.$.contact_salesforce_id":

@@ -36,7 +36,6 @@ var SelectClassPage = React.createClass({
     const classOptions = this.props.classes.map(function(nooraClass) {
       return { value: nooraClass.name, name: nooraClass.name };
     });
-    console.log(classOptions);
 
     return (
       <div>
@@ -53,7 +52,7 @@ var SelectClassPage = React.createClass({
           <Form.Input
             type='number'
             key= 'total_number_attended'
-            label="Total Number Attended"
+            label="Total Number Households"
             value={ this.state.num_attendees }
             onChange={ this._handleChange("num_attendees") }
           />

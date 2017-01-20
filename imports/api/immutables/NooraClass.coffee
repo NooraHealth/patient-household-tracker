@@ -20,7 +20,8 @@ BaseNooraClass = Immutable.Record {
   attendance_report_salesforce_id: '',
   facility_name: '',
   majority_language: '',
-  attendees: Immutable.List()
+  attendees: Immutable.List(),
+  errored_attendees: []
 }
 
 class NooraClass extends BaseNooraClass
@@ -56,13 +57,24 @@ if Meteor.isServer
       console.log "Syncing with salesforce"
       toSalesforce = new SalesforceInterface()
       if classDoc.attendance_report_salesforce_id != '' and classDoc.attendees.length > 0
-        promise = toSalesforce.exportAttendees(classDoc)
-        promise.then(( attendees )->
+        promise = toSalesforce.exportAttendees(classDoc, classDoc.attendees)
+        promise.then(( results )->
           console.log "Success exporting attendees"
-          classDoc.attendees = attendees
-          classDoc.export_attendees_error = false
+          console.log "The errored attendees"
+          console.log results
+          console.log results.errored
+          classDoc.attendees = results.successful
+          classDoc.errored_attendees = results.errored
           Classes.update { name: classDoc.name }, {$set: classDoc }
-          console.log Classes.findOne { name: classDoc.name }
+          #TODO: make this clearer that this is to account for errors
+          return toSalesforce.exportAttendees(classDoc, results.errored)
+        ).then(( results )->
+          console.log "Attendees that were errored and now are not"
+          console.log results
+          classDoc.attendees = classDoc.attendees.concat results.successful
+          classDoc.errored_attendees = results.errored
+          classDoc.export_attendees_error = if results.errored.length > 0 then true else false
+          Classes.update { name: classDoc.name }, {$set: classDoc }
         , ( err )->
           Classes.update { name: classDoc.name }, {$set: { export_attendees_error: true }}
           console.log "error exporting attendees"

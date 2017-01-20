@@ -40,6 +40,9 @@ var RegisterAttendeesPage = React.createClass({
   componentDidMount(){
     /* set default language for all attendees */
     var list = this.state.nooraClass.attendees;
+    if( list.size == this.props.numAttendees ){
+      return;
+    }
     var majorityLanguage = this.state.nooraClass.majority_language;
     for(var i = 0; i < this.props.numAttendees; i++){
       list = list.set(i, {'language': majorityLanguage});
@@ -52,9 +55,10 @@ var RegisterAttendeesPage = React.createClass({
     const name = ( attendee )? attendee.name: '';
     const phone1 = ( attendee )? attendee.phone_1: '';
     const phone2 = ( attendee )? attendee.phone_2: '';
-    const patientAttended = ( attendee )? attendee.patient_attended: 'false';
+    const patientAttended = ( attendee )? attendee.patient_attended: false;
     const numCaregivers = ( attendee )? attendee.num_caregivers_attended: '';
     const language = ( attendee )? attendee.language: '';
+    const diagnosis = ( attendee )? attendee.diagnosis: '';
     const selectedLanguage = { name: language, value: language };
     const languageOptions = this.props.supportedLanguages.map( function(language){
         return { name: language, value: language };
@@ -87,7 +91,7 @@ var RegisterAttendeesPage = React.createClass({
         <Form.Checkbox
           key= { 'patient-attended--' + i }
           label="Patient Attended?"
-          value={ patientAttended }
+          checked={ patientAttended }
           onChange={ this._handleChange(i, "patient_attended") }
         />
         <Form.Input
@@ -102,6 +106,7 @@ var RegisterAttendeesPage = React.createClass({
           label="Diagnosis"
           onChange={ this._handleChange(i, "diagnosis") }
           source={ diagnosisOptions }
+          value={ diagnosis }
         />
         <Form.Dropdown
           key= {'language-- ' + i }
