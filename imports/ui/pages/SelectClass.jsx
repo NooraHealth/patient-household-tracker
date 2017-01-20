@@ -27,13 +27,12 @@ var SelectClassPage = React.createClass({
     return {
       loading: false,
       class_name: '',
-      num_attendees: 4
+      num_attendees: ''
     }
   },
 
   render() {
     const submitText = "SELECT CLASS"
-    console.log("Classes");
     const classOptions = this.props.classes.map(function(nooraClass) {
       return { value: nooraClass.name, name: nooraClass.name };
     });

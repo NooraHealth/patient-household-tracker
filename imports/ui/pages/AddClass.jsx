@@ -1,4 +1,4 @@
-  'use strict';
+'use strict';
 
 import React from 'react';
 import moment from 'moment';
@@ -265,6 +265,7 @@ var AddClassPage = React.createClass({
         title: "Class Saved Successfully",
         text: text
       });
+      FlowRouter.go("home");
     };
 
     const onSaveError = function(error) {
