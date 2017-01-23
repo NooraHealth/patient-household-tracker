@@ -43,6 +43,7 @@ ClassesSchema = new SimpleSchema
   end_time:
     type: String
     defaultValue: ""
+    optional:true
   export_class_error:
     type: Boolean
     defaultValue: false
