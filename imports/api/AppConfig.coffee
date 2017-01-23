@@ -11,7 +11,8 @@ class AppConfig
       Session.set "current_facility_name", name
 
     getSupportedLanguages: ->
-      return ['English', 'Kannada', 'Hindi', 'Telugu'];
+      return ['English', 'Kannada', 'Hindi', 'Telugu',
+      'Bengali', 'Tamil', 'Malayalam', 'Odiya', 'Konkani', 'Marathi'];
 
     getBaseDiagnoses: ->
       return ["CABG", "VSD (ventricular septal defect)",
