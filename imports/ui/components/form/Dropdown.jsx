@@ -34,7 +34,8 @@ var Dropdown = React.createClass({
     $(this.dropdown).dropdown({
       onChange: function(value, text, selectedItem) {
         onChange(value);
-      }
+      },
+      fullTextSearch: true
     });
     const values = this._getValues(this.props.selected);
     $(this.dropdown).dropdown("set exactly", values);
