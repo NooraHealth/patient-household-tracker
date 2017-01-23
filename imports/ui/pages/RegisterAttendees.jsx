@@ -67,25 +67,32 @@ var RegisterAttendeesPage = React.createClass({
         return { title: diagnosis };
     });
     return (
+      <div>
+      <br/>
+      <div className="ui dividing header"> Attendee { i+1 }</div>
+      <br/>
       <div className="fields">
         <Form.Input
           key= { 'name--' + i }
-          label= "Name"
+          placeholder= "Name"
+          inputClasses="four wide"
           value={ name }
           onChange={ this._handleChange(i, "name") }
         />
         <Form.Input
           type='tel'
           key= { 'phone1--' + i }
-          label="Phone One"
+          placeholder="Phone One"
+          inputClasses="four wide"
           value={ phone1 }
           onChange={ this._handleChange(i, "phone_1") }
         />
         <Form.Input
           type='tel'
           key= { 'phone2--' + i }
-          label="Phone Two"
+          placeholder="Phone Two"
           value={ phone2 }
+          inputClasses="four wide"
           onChange={ this._handleChange(i, "phone_2") }
         />
         <Form.Checkbox
@@ -97,7 +104,8 @@ var RegisterAttendeesPage = React.createClass({
         <Form.Input
           type='number'
           key= { 'num-caregivers--' + i }
-          label="# Caregivers Attended"
+          inputClasses="four wide"
+          placeholder="# Caregivers Attended"
           value={ numCaregivers }
           onChange={ this._handleChange(i, "num_caregivers_attended") }
         />
@@ -116,6 +124,7 @@ var RegisterAttendeesPage = React.createClass({
           options={ languageOptions }
           selected={ [{ value: language, name: language}] }
         />
+      </div>
       </div>
     )
   },

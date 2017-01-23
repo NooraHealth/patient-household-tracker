@@ -25,9 +25,14 @@ var Input = React.createClass({
   },
 
   render(){
-    var { title, icon, value, onChange, ...inputProps } = this.props;
+    var { title, icon, value, inputClasses, onChange, ...inputProps } = this.props;
+    let classes = "field";
+    console.log(inputClasses);
+    if( inputClasses !== undefined ){
+      classes = inputClasses + " " + classes;
+    }
     return (
-      <div className={ this.getClasses() }>
+      <div className={ classes }>
         { this.getInputPrefix() }
         <input
           { ...inputProps }
@@ -36,14 +41,6 @@ var Input = React.createClass({
         />
       </div>
     );
-  },
-
-  getClasses() {
-    if( this.props.icon ){
-      return "field ui fluid left icon input";
-    } else {
-      return "field";
-    }
   },
 
   getInputPrefix() {

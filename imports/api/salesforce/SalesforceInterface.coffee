@@ -13,7 +13,7 @@ class SalesforceInterface
       if classDoc.educators.length is 0
         resolve []
 
-    
+
       facility = Facilities.findOne {
         salesforce_id: classDoc.facility_salesforce_id
       }
