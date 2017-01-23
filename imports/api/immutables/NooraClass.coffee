@@ -32,13 +32,13 @@ class NooraClass extends BaseNooraClass
     });
 
   setClassName: ->
-    return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }, #{this.start_time} to #{this.end_time}"
+    suffix = if this.end_time then " to #{this.end_time}" else ""
+    return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }, #{this.start_time}#{suffix}"
 
   save: ->
     nooraClass = this.set("date_created", moment().toISOString());
     if nooraClass.name == ''
       nooraClass = nooraClass.setClassName()
-      console.log "Saving this class"
       console.log nooraClass.toJS()
     return new Promise ( resolve, reject )->
       Meteor.call "nooraClass.upsert", nooraClass.toJS(), ( error, results )->
@@ -107,6 +107,8 @@ if Meteor.isServer
       nooraClass.facility_salesforce_id = facility.salesforce_id
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);
+      console.log "Upserted!!"
+      console.log nooraClass
       return Classes.upsert { name: nooraClass.name }, { $set: nooraClass }
 
 module.exports.NooraClass = NooraClass

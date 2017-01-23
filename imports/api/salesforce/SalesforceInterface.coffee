@@ -10,6 +10,10 @@ class SalesforceInterface
 
   exportClassEducators: ( classDoc )->
     return new Promise (resolve, reject)->
+      if classDoc.educators.length is 0
+        resolve []
+
+    
       facility = Facilities.findOne {
         salesforce_id: classDoc.facility_salesforce_id
       }
@@ -86,6 +90,7 @@ class SalesforceInterface
         salesforce_id: nooraClass.facility_salesforce_id
       }
 
+      endTime = if nooraClass.end_time then getDateTime(nooraClass.date, nooraClass.end_time, "Asia/Kolkata") else null
       salesforceObj = {
         "Name": nooraClass.name
         "Condition_Operation__c": nooraClass.condition_operation_salesforce_id
@@ -93,7 +98,7 @@ class SalesforceInterface
         "Num_Family_Members_Attended_Class__c": nooraClass.total_family_members
         "Num_Patients_Attended_Class__c": nooraClass.total_patients
         "Start_DateTime__c": getDateTime(nooraClass.date, nooraClass.start_time, "Asia/Kolkata")
-        "End_DateTime__c": getDateTime(nooraClass.date, nooraClass.end_time, "Asia/Kolkata")
+        "End_DateTime__c": endTime
       }
 
       callback = Meteor.bindEnvironment ( err, ret ) ->
