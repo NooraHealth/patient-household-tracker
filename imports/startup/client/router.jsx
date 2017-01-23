@@ -2,6 +2,7 @@
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import React from 'react';
 import { mount } from 'react-mounter';
+import moment from 'moment'
 
 import { MainLayout } from '../../ui/layout.jsx';
 import { HomePage } from '../../ui/pages/Home.jsx';

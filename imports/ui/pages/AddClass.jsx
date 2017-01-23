@@ -9,6 +9,7 @@ import { ConditionOperations } from '../../api/collections/condition_operations.
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { getHour } from '../../api/utils.coffee';
 import { getMinute } from '../../api/utils.coffee';
+import { getDateTime } from '../../api/utils.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';
 import DatePicker from 'react-datepicker';
 

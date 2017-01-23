@@ -92,8 +92,8 @@ class SalesforceInterface
         "Location__c": nooraClass.location
         "Num_Family_Members_Attended_Class__c": nooraClass.total_family_members
         "Num_Patients_Attended_Class__c": nooraClass.total_patients
-        "Start_DateTime__c": getDateTime(nooraClass.date, nooraClass.start_time)
-        "End_DateTime__c": getDateTime(nooraClass.date, nooraClass.end_time)
+        "Start_DateTime__c": getDateTime(nooraClass.date, nooraClass.start_time, "Asia/Kolkata")
+        "End_DateTime__c": getDateTime(nooraClass.date, nooraClass.end_time, "Asia/Kolkata")
       }
 
       callback = Meteor.bindEnvironment ( err, ret ) ->
