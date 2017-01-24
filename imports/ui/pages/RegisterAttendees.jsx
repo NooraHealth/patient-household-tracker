@@ -153,7 +153,7 @@ var RegisterAttendeesPage = React.createClass({
     });
     return (
       <div>
-      <Form onSubmit={ this._registerAttendees } submitButtonContent={ submitText } disabled={ this.state.loading } >
+      <Form onSubmit={ this._onSubmit } submitButtonContent={ submitText } disabled={ this.state.loading } >
         <div className="fields">
           <div className="field">
             <div className="ui yellow label">
@@ -182,6 +182,34 @@ var RegisterAttendeesPage = React.createClass({
       this.setState({ nooraClass: nooraClass })
     }
   },
+
+  _onSubmit() {
+    const that = this;
+    try {
+      swal({
+        type: "info",
+        closeOnConfirm: true,
+        showCancelButton: true,
+        text: "Are you sure you want to register these attendees?",
+        title: "Confirm"
+      }, function( isConfirm ) {
+        if( !isConfirm ) {
+          that.setState({ loading: false });
+          return;
+        }
+        that.setState({ loading: true });
+        that._registerAttendees()
+      });
+    } catch(error) {
+      this.setState({ loading: false });
+      swal({
+        type: "error",
+        title: "Oops!",
+        text: error.message
+      });
+    }
+  },
+
 
   _registerAttendees() {
     const that = this;
