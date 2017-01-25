@@ -73,7 +73,14 @@ var RegisterAttendeesPage = React.createClass({
     return (
       <div>
       <br/>
-      <div className="ui dividing header"> Attendee { i+1 }</div>
+      <div className="ui dividing header">
+          Attendee { i+1 }
+          { this.props.editMode &&
+            <button className="ui icon red button add-margin" onClick={ this._deleteAttendee.bind(i) }>
+              <i className="trash icon"></i>
+            </button>
+          }
+      </div>
       <br/>
       <div className="fields">
         <Form.Input
@@ -170,8 +177,8 @@ var RegisterAttendeesPage = React.createClass({
 
         { rows }
         { this.props.editMode &&
-          <button className="ui labeled icon red button" onClick={ this._addAttendee }>
-            Add Attendee <i className="large plus icon"></i>
+          <button className="ui labeled icon blue button" onClick={ this._addAttendee }>
+            Add Attendee <i className="large add user icon"></i>
           </button>
         }
       </Form>
@@ -194,6 +201,10 @@ var RegisterAttendeesPage = React.createClass({
 
   _addAttendee(){
     this.setState({ "numRows": this.state.numRows+1 });
+  },
+
+  _deleteAttendee( index ){
+    console.log("DELETE");
   },
 
   _onSubmit() {

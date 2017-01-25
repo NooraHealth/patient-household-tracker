@@ -5,6 +5,10 @@
   margin-top: 7em;
 }
 
+.add-margin {
+  margin: 15px !important;
+}
+
 .ui.search .prompt {
   border-radius: 0;
 }
