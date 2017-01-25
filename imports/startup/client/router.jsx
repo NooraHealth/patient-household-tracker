@@ -33,13 +33,14 @@ FlowRouter.route('/addClass', {
   }
 });
 
-FlowRouter.route('/selectClass', {
+FlowRouter.route('/selectClass/:editMode', {
   name: "selectClass",
   action: function( params ){
     mount( MainLayout, {
       nav_components: <BackButton key='back_button'/>,
       content: <SelectClassContainer
         key='select_class_page'
+        editMode={ params.editMode == "edit" }
         />
     });
   }
@@ -53,6 +54,7 @@ FlowRouter.route('/registerAttendees/:className', {
       content: <RegisterAttendeesContainer
         key='register_attendees_page'
         className={ params.className }
+        editMode={ queryParams.editMode == "true" }
         numAttendees={ parseInt(queryParams.numAttendees) }
         />
     });

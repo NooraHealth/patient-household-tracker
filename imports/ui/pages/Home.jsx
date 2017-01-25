@@ -25,9 +25,15 @@ const HomePage = React.createClass({
         </a></p>
 
         <p><a
-          href="/selectClass"
+          href="/selectClass/addNew"
           className="fluid ui blue button"
           > Add Attendees
+        </a></p>
+
+        <p><a
+          href="/selectClass/edit"
+          className="fluid ui blue button"
+          > Edit Attendees
         </a></p>
       </div>
     )

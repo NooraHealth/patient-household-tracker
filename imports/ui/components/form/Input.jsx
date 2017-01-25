@@ -27,7 +27,6 @@ var Input = React.createClass({
   render(){
     var { title, icon, value, inputClasses, onChange, ...inputProps } = this.props;
     let classes = "field";
-    console.log(inputClasses);
     if( inputClasses !== undefined ){
       classes = inputClasses + " " + classes;
     }

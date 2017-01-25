@@ -15,6 +15,7 @@ var RegisterAttendeesPage = React.createClass({
   propTypes: {
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
+    editMode: React.PropTypes.bool,
     numAttendees: React.PropTypes.number,
     diagnoses: React.PropTypes.array,
     classDoc: React.PropTypes.object
@@ -25,6 +26,7 @@ var RegisterAttendeesPage = React.createClass({
       currentFacilityName: "",
       numAttendees: 0,
       loading: true,
+      editMode: false,
       classDoc: {}
     }
   },
@@ -33,16 +35,18 @@ var RegisterAttendeesPage = React.createClass({
     const nooraClass = new NooraClass(this.props.classDoc);
     return {
       loading: false,
+      numRows: this.props.numAttendees,
       nooraClass: nooraClass
     }
   },
 
   componentDidMount(){
     /* set default language for all attendees */
-    var list = this.state.nooraClass.attendees;
-    if( list.size == this.props.numAttendees ){
+    if( this.props.editMode ){
       return;
     }
+
+    var list = this.state.nooraClass.attendees;
     var majorityLanguage = this.state.nooraClass.majority_language;
     for(var i = 0; i < this.props.numAttendees; i++){
       list = list.set(i, {'language': majorityLanguage});
@@ -134,7 +138,7 @@ var RegisterAttendeesPage = React.createClass({
     const attendees = this.state.nooraClass.attendees.toArray();
     const that = this;
     let rows = [];
-    for( var i=0; i < this.props.numAttendees; i++ ){
+    for( var i=0; i < this.state.numRows; i++ ){
       let key = "attendee" + i;
       // let attendee = this.state.nooraClass.attendees.get(i);
       rows.push(
@@ -165,6 +169,11 @@ var RegisterAttendeesPage = React.createClass({
         </div>
 
         { rows }
+        { this.props.editMode &&
+          <button className="ui labeled icon red button" onClick={ this._addAttendee }>
+            Add Attendee <i className="large plus icon"></i>
+          </button>
+        }
       </Form>
       </div>
     )
@@ -181,6 +190,10 @@ var RegisterAttendeesPage = React.createClass({
       const nooraClass = this.state.nooraClass.set("attendees", list);
       this.setState({ nooraClass: nooraClass })
     }
+  },
+
+  _addAttendee(){
+    this.setState({ "numRows": this.state.numRows+1 });
   },
 
   _onSubmit() {

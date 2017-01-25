@@ -42,7 +42,7 @@ class SalesforceInterface
       for educator, i in educators
         Salesforce.sobject("Class_Educator__c").insert educator, callback.bind(this, classDoc.educators[i] )
 
-  exportAttendees: ( classDoc, attendees )->
+  upsertAttendees: ( classDoc, attendees )->
     return new Promise (resolve, reject)->
       if attendees.length is 0
         resolve({ successful: [], errored: [] })
@@ -52,8 +52,6 @@ class SalesforceInterface
       }
 
       contacts = attendees.map ( attendee )->
-        console.log 'the attendee'
-        console.log attendee
         return {
           "LastName" : attendee.name
           "MobilePhone" : attendee.phone_1 or 0,
@@ -83,6 +81,33 @@ class SalesforceInterface
       #insert into the Salesforce database
       for contact, i in contacts
         Salesforce.sobject("Contact").insert contact, callback.bind(this, attendees[i] )
+
+  deleteAttendees: ( attendanceReportId, attendeeContactIds )->
+    return new Promise ( resolve, reject )->
+      result = Salesforce.sobject("Contact").find(
+        { 'Attendance_Report__c.Id' : attendanceReportId },
+        {
+          Id: 1,
+          Name: 1
+        }
+      ).execute( (err, attendees)->
+        deleted = 0
+        if attendees is undefined or attendees.length == 0
+          console.log "Attendees was undefined or length 0"
+          resolve()
+        for attendee in attendees
+          if attendee.Id in attendeeContactIds
+            Salesforce.sobject("Contact").destroy attendee.Id, (err, ret)->
+              if err
+                console.log "Error deleting condition operations"
+                console.log err
+                reject err
+              else
+                console.log "deleted!!"
+                deleted++
+                if deleted == attendeeContactIds.length
+                  resolve()
+      )
 
   exportClass: ( nooraClass )->
     return new Promise (resolve, reject)->

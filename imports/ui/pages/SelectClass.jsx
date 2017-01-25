@@ -12,6 +12,7 @@ var SelectClassPage = React.createClass({
   propTypes: {
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
+    editMode: React.PropTypes.bool,
     classes: React.PropTypes.array
   },
 
@@ -49,13 +50,15 @@ var SelectClassPage = React.createClass({
             options={ classOptions }
             selected={ [{ value: this.state.class_name, name: this.state.class_name}] }
           />
-          <Form.Input
-            type='number'
-            key= 'total_number_attended'
-            label="Total Number Households"
-            value={ this.state.num_attendees }
-            onChange={ this._handleChange("num_attendees") }
-          />
+          { !this.props.editMode &&
+              <Form.Input
+              type='number'
+              key= 'total_number_attended'
+              label="Total Number Households"
+              value={ this.state.num_attendees }
+              onChange={ this._handleChange("num_attendees") }
+            />
+          }
         </Form>
       </div>
     )
@@ -65,7 +68,8 @@ var SelectClassPage = React.createClass({
     FlowRouter.go("registerAttendees", {
       className: this.state.class_name
     }, {
-      numAttendees: this.state.num_attendees
+      numAttendees: this.state.num_attendees,
+      editMode: this.props.editMode
     });
   },
 

@@ -1,5 +1,6 @@
 
 { Educators } = require '../imports/api/collections/educators.coffee';
+{ UniqueID } = require '../imports/api/collections/unique_id.coffee';
 { Classes } = require '../imports/api/collections/classes.coffee';
 { Facilities } = require '../imports/api/collections/facilities.coffee';
 { ConditionOperations } = require '../imports/api/collections/condition_operations.coffee';

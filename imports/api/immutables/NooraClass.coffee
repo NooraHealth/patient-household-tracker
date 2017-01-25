@@ -3,6 +3,7 @@ Immutable = require 'immutable'
 moment = require 'moment'
 { Facilities } = require '../collections/facilities.coffee'
 { Classes } = require '../collections/classes.coffee'
+{ UniqueID } = require '../collections/unique_id.coffee'
 { ClassesSchema } = require '../collections/classes.coffee'
 
 BaseNooraClass = Immutable.Record {
@@ -31,23 +32,16 @@ class NooraClass extends BaseNooraClass
       educators: Immutable.List properties && properties.educators
     });
 
-  setClassName: ->
-    suffix = if this.end_time then " to #{this.end_time}" else ""
-    return this.set "name", "#{ this.facility_name }: #{ this.location } - #{ this.date }, #{this.start_time}#{suffix}"
-
   save: ->
-    nooraClass = this.set("date_created", moment().toISOString());
-    if nooraClass.name == ''
-      nooraClass = nooraClass.setClassName()
-      console.log nooraClass.toJS()
+    nooraClass = this
     return new Promise ( resolve, reject )->
       Meteor.call "nooraClass.upsert", nooraClass.toJS(), ( error, results )->
         if error
           reject error
         else
-          nooraClassDoc = Classes.findOne({ name: nooraClass.name })
-          Meteor.call "syncWithSalesforce", nooraClassDoc
-          resolve nooraClass
+          doc = Classes.findOne({ name: nooraClass.name })
+          Meteor.call "syncWithSalesforce", doc
+          resolve Classes.findOne { name: nooraClass.name }
 
 if Meteor.isServer
   { SalesforceInterface } = require '../salesforce/SalesforceInterface.coffee'
@@ -57,7 +51,7 @@ if Meteor.isServer
       console.log "Syncing with salesforce"
       toSalesforce = new SalesforceInterface()
       if classDoc.attendance_report_salesforce_id != '' and classDoc.attendees.length > 0
-        promise = toSalesforce.exportAttendees(classDoc, classDoc.attendees)
+        promise = toSalesforce.upsertAttendees(classDoc, classDoc.attendees)
         promise.then(( results )->
           console.log "Success exporting attendees"
           console.log "The errored attendees"
@@ -67,7 +61,7 @@ if Meteor.isServer
           classDoc.errored_attendees = results.errored
           Classes.update { name: classDoc.name }, {$set: classDoc }
           #TODO: make this clearer that this is to account for errors
-          return toSalesforce.exportAttendees(classDoc, results.errored)
+          return toSalesforce.upsertAttendees(classDoc, results.errored)
         ).then(( results )->
           console.log "Attendees that were errored and now are not"
           console.log results
@@ -99,15 +93,31 @@ if Meteor.isServer
           console.log err
           Classes.update { name: classDoc.name }, {$set: { export_class_error: true }}
         )
+    setClassName: ->
 
     "nooraClass.upsert": ( nooraClass )->
+      getClassName = (doc)->
+        suffix = if doc.end_time then " to #{doc.end_time}" else ""
+        return "#{ doc.facility_name }: #{ doc.location } - #{ doc.date }, #{doc.start_time}#{suffix}"
+
+      if not nooraClass.date_created? or nooraClass.date_created is ''
+        nooraClass.date_created = moment().toISOString()
+
+      if not nooraClass.name? or nooraClass.name is ''
+        nooraClass.name = getClassName(nooraClass)
+
+      # nooraClass.attendees = nooraClass.attendees.forEach ( attendee )=>
+      #   if not attendee.patient_id? or attendee.patient_id == ''
+      #     attendee.patient_id = getNewPatientId(attendee)
+      #   return attendee
+      #
       facility = Facilities.findOne { name: nooraClass.facility_name }
       if not facility
         throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
       nooraClass.facility_salesforce_id = facility.salesforce_id
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);
-      console.log "Upserted!!"
+      console.log "Saving this nooraClass"
       console.log nooraClass
       return Classes.upsert { name: nooraClass.name }, { $set: nooraClass }
 
