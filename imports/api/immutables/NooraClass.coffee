@@ -78,10 +78,9 @@ if Meteor.isServer
         classDoc.export_class_error = false
         Classes.update { name: classDoc.name }, {$set: classDoc }
         return toSalesforce.upsertAttendees(classDoc, attendees)
-      ).then( (results)->
+      ).then( (attendees)->
         console.log "Upserted attendees that were errored and now are not"
-        classDoc.attendees = results.successful
-        classDoc.errored_attendees = classDoc.errored_attendees.concat results.errored
+        classDoc.attendees = attendees
         Classes.update { name: classDoc.name }, {$set: classDoc }
         return toSalesforce.deleteAttendees(deletedAttendees)
       ).then( (results)->

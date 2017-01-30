@@ -40,12 +40,20 @@ class SalesforceInterface
         if err
           console.log "Error exporting class educators"
           console.log err
-          reject(err)
+          educator.export_error = err
         else
+          console.log "Successfulll exported"
+          educator.export_error = null
           educator.class_educator_salesforce_id = ret.id
-          updatedEducators.push educator
-          if updatedEducators.length == toExport.length
-            resolve updatedEducators
+        updatedEducators.push educator
+        if updatedEducators.length == toExport.length
+          educators = classDoc.educators.map (educator, i)->
+            updatedEducator = updatedEducators[i]
+            if updatedEducator? and updatedEducator.contact_salesforce_id == educator.contact_salesforce_id
+              return updatedEducator
+            else
+              return educator
+          resolve educators
 
       #insert into the Salesforce database
       for educator, i in educators
@@ -55,7 +63,8 @@ class SalesforceInterface
     return new Promise (resolve, reject)->
       console.log "Upserting attendees"
       if attendees.length is 0
-        resolve({ successful: [], errored: [] })
+        resolve []
+        return
 
       facility = Facilities.findOne {
         salesforce_id: classDoc.facility_salesforce_id
@@ -76,39 +85,31 @@ class SalesforceInterface
       }
 
       updatedAttendees = []
-      erroredAttendees = []
       callback = Meteor.bindEnvironment ( attendee, err, ret ) ->
         if err
           console.log "Error exporting class attendees"
           console.log err
-          erroredAttendees.push(attendee)
+          attendee.export_error = err
         else
           console.log "Successfully inserted attendee"
+          attendee.export_error = null
           attendee.contact_salesforce_id = ret.id
-          updatedAttendees.push attendee
-        if((erroredAttendees.length + updatedAttendees.length) == attendees.length)
-          console.log "About to resolve"
-          resolve({ successful: updatedAttendees, errored: erroredAttendees} )
+        updatedAttendees.push attendee
+        if updatedAttendees.length == attendees.length
+          resolve( updatedAttendees )
 
       i = 0
       upsertNextAttendee = ->
-        console.log "Upserting the attendee #{i}"
         contact = contacts[i]
         attendee = attendees[i]
         recordId = attendee.contact_salesforce_id
         if recordId? and recordId != ''
-          console.log "Updating"
           contact.Id = recordId
           Salesforce.sobject("Contact").update contact, "Id", callback.bind(this, attendee )
         else
-          console.log "inserting"
           Salesforce.sobject("Contact").insert contact, callback.bind(this, attendee )
         i = ++i
-        console.log "i == #{i}"
-        console.log this.handle
         if i is contacts.length
-          console.log "About to clear the interval"
-          console.log this.handle
           Meteor.clearInterval(this.handle)
 
       this.handle = Meteor.setInterval(upsertNextAttendee.bind(this), 300)

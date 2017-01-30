@@ -55,30 +55,17 @@ ClassesSchema = new SimpleSchema
   #TODO: Make all references to salesforce ids the same term
   "educators.$.contact_salesforce_id":
     type: String
+  "educators.$.error_exporting":
+    type: [Object]
+    optional: true
   "educators.$.class_educator_salesforce_id":
-    type: String
-    optional: true
-  "errored_attendees.$.name":
-    type: String
-  "errored_attendees.$.patient_attended":
-    type: Boolean
-    optional: true
-  "errored_attendees.$.language":
-    type: String
-  "errored_attendees.$.diagnosis":
-    type: String
-    optional: true
-    defaultValue: null
-  "errored_attendees.$.num_caregivers_attended":
-    type: Number
-  "errored_attendees.$.phone_1":
-    type: String
-    optional:true
-  "errored_attendees.$.phone_2":
     type: String
     optional: true
   "attendees.$.name":
     type: String
+  "attendees.$.error_exporting":
+    type: [Object]
+    optional: true
   "attendees.$.contact_salesforce_id":
     type: String
     defaultValue: ''
