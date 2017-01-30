@@ -14,7 +14,6 @@ var MainLayout = React.createClass({
         </div>
       </div>
     )
-
   }
 });
 

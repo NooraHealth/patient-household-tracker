@@ -50,6 +50,7 @@ var AddClassPage = React.createClass({
   },
 
   render() {
+    console.log("Redering");
     let submitText = "SAVE CLASS";
     if( this.state.loading )
       submitText = "...loading..."

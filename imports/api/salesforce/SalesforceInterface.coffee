@@ -7,12 +7,22 @@ class SalesforceInterface
 
   constructor: ->
     login = Salesforce.login Meteor.settings.SF_USER, Meteor.settings.SF_PASS, Meteor.settings.SF_TOKEN
+    console.log login
 
   exportClassEducators: ( classDoc )->
     return new Promise (resolve, reject)->
-      if classDoc.educators.length is 0
-        resolve []
+      toExport = classDoc.educators.filter (educator)->
+        id = educator.contact_salesforce_id
+        if id? and id != ''
+          return false
+        else
+          return true
 
+      console.log "Exporting these educators:"
+      console.log classDoc.educators
+      console.log toExport
+      if toExport.length is 0
+        resolve classDoc.educators
 
       facility = Facilities.findOne {
         salesforce_id: classDoc.facility_salesforce_id
@@ -44,6 +54,7 @@ class SalesforceInterface
 
   upsertAttendees: ( classDoc, attendees )->
     return new Promise (resolve, reject)->
+      console.log "Upserting attendees"
       if attendees.length is 0
         resolve({ successful: [], errored: [] })
 
@@ -80,37 +91,55 @@ class SalesforceInterface
 
       #insert into the Salesforce database
       for contact, i in contacts
-        Salesforce.sobject("Contact").insert contact, callback.bind(this, attendees[i] )
+        recordId = attendees[i].contact_salesforce_id
+        if recordId? and recordId != ''
+          console.log "Updating attendee!!"
+          contact.Id = recordId
+          Salesforce.sobject("Contact").update contact, "Id", callback.bind(this, attendees[i] )
+        else
+          console.log "inserting attendee"
+          Salesforce.sobject("Contact").insert contact, callback.bind(this, attendees[i] )
 
-  deleteAttendees: ( attendanceReportId, attendeeContactIds )->
+
+  deleteAttendees: ( attendees )->
     return new Promise ( resolve, reject )->
-      result = Salesforce.sobject("Contact").find(
-        { 'Attendance_Report__c.Id' : attendanceReportId },
-        {
-          Id: 1,
-          Name: 1
-        }
-      ).execute( (err, attendees)->
-        deleted = 0
-        if attendees is undefined or attendees.length == 0
-          console.log "Attendees was undefined or length 0"
-          resolve()
-        for attendee in attendees
-          if attendee.Id in attendeeContactIds
-            Salesforce.sobject("Contact").destroy attendee.Id, (err, ret)->
+      console.log "Attndees to delete"
+      console.log attendees
+      console.log attendees.length
+      if attendees.length == 0
+        console.log "REsolving"
+        resolve []
+      else
+        ids = attendees.map (attendee)-> return attendee.contact_salesforce_id
+        result = Salesforce.sobject("Contact").find(
+          { 'Id' : {$in: ids} },
+          {
+            Id: 1,
+            Name: 1
+          }
+        ).execute( (err, contacts )->
+          console.log "Contacts found"
+          console.log contacts.length
+          if contacts.length is 0
+            reject "Contacts not found in salesforce"
+          for contact in contacts
+            Salesforce.sobject("Contact").destroy contact.Id, (err, ret)->
               if err
-                console.log "Error deleting condition operations"
+                console.log "Error deleting attendee #{contact.Id}"
                 console.log err
                 reject err
               else
-                console.log "deleted!!"
-                deleted++
-                if deleted == attendeeContactIds.length
-                  resolve()
-      )
+                console.log "Successfully deleted the contact"
+                resolve( ret )
+        )
 
   exportClass: ( nooraClass )->
     return new Promise (resolve, reject)->
+      #if nooraclass has already been uploaded
+      id = nooraClass.attendance_report_salesforce_id
+      if id? and id != ''
+        resolve( id )
+
       facility = Facilities.findOne {
         salesforce_id: nooraClass.facility_salesforce_id
       }
@@ -128,7 +157,7 @@ class SalesforceInterface
 
       callback = Meteor.bindEnvironment ( err, ret ) ->
         if err
-          console.log "Error exporting nurse educator"
+          console.log "Error exporting class"
           console.log err
           reject(err)
         else

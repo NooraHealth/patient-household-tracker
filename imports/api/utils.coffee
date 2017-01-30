@@ -2,10 +2,6 @@
 moment  = require 'moment-timezone'
 
 getDateTime = ( date, time, timezone )->
-  console.log "Getting the regular old moment"
-  console.log timezone
-  console.log "THAT WAS THE ICO"
-  console.log "#{date} #{time}"
   return moment.tz("#{date} #{time}", timezone).format()
   # return moment(date)
   #   .add(getHour(time), "hours")

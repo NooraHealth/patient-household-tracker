@@ -49,7 +49,7 @@ var RegisterAttendeesPage = React.createClass({
     var list = this.state.nooraClass.attendees;
     var majorityLanguage = this.state.nooraClass.majority_language;
     for(var i = 0; i < this.props.numAttendees; i++){
-      list = list.set(i, {'language': majorityLanguage});
+      list = this._initializeAttendee( i, majorityLanguage );
     }
     const nooraClass = this.state.nooraClass.set("attendees", list);
     this.setState({ nooraClass: nooraClass })
@@ -76,7 +76,7 @@ var RegisterAttendeesPage = React.createClass({
       <div className="ui dividing header">
           Attendee { i+1 }
           { this.props.editMode &&
-            <button className="ui icon red button add-margin" onClick={ this._deleteAttendee.bind(i) }>
+            <button className="ui icon red button add-margin" onClick={ this._deleteAttendee.bind(this, i, attendee) }>
               <i className="trash icon"></i>
             </button>
           }
@@ -163,7 +163,6 @@ var RegisterAttendeesPage = React.createClass({
       )
     });
     return (
-      <div>
       <Form onSubmit={ this._onSubmit } submitButtonContent={ submitText } disabled={ this.state.loading } >
         <div className="fields">
           <div className="field">
@@ -182,7 +181,6 @@ var RegisterAttendeesPage = React.createClass({
           </button>
         }
       </Form>
-      </div>
     )
   },
 
@@ -193,18 +191,36 @@ var RegisterAttendeesPage = React.createClass({
         newValues = {};
       }
       newValues[field] = value;
+      console.log("Setting");
+      console.log(newValues);
       const list = this.state.nooraClass.attendees.set(index, newValues);
       const nooraClass = this.state.nooraClass.set("attendees", list);
+      console.log(nooraClass.attendees);
       this.setState({ nooraClass: nooraClass })
     }
   },
 
   _addAttendee(){
-    this.setState({ "numRows": this.state.numRows+1 });
+    const index = this.state.numRows;
+    const language = this.state.nooraClass.majority_language;
+    this._initializeAttendee( index, language );
+    this.setState({ "numRows": index+1 });
   },
 
-  _deleteAttendee( index ){
-    console.log("DELETE");
+  _initializeAttendee( index, language ){
+    console.log("Initializing attendee");
+    console.log(index);
+    console.log(language);
+    this._handleChange(index, "language")(language);
+  },
+
+  _deleteAttendee( index, attendee ){
+    const attendees = this.state.nooraClass.attendees.delete(index);
+    const deleted = this.state.nooraClass.deleted_attendees.push(attendee);
+    let nooraClass = this.state.nooraClass.set("attendees", attendees);
+    nooraClass = nooraClass.set("deleted_attendees", deleted);
+    this.setState({ nooraClass: nooraClass })
+    this.setState({ "numRows": this.state.numRows-1 });
   },
 
   _onSubmit() {
@@ -234,18 +250,18 @@ var RegisterAttendeesPage = React.createClass({
     }
   },
 
+  _showPopup( options, callback ) {
+    Meteor.setTimeout( ()=> {
+      swal(options, callback);
+    }, 100 );
+  },
 
   _registerAttendees() {
     const that = this;
-    const showPopup = ( options, callback )=> {
-      Meteor.setTimeout( ()=> {
-        swal(options, callback);
-      }, 100 );
-    };
 
     const onSaveSuccess = function( nooraClass ){
       const text = nooraClass.name + ": " + nooraClass.attendees.size + " attendees";
-      showPopup({
+      that._showPopup({
         type: "success",
         title: "Attendees Saved Successfully",
         text: text
@@ -256,7 +272,7 @@ var RegisterAttendeesPage = React.createClass({
     const onSaveError = function(error) {
       /* TODO: render according to whether loading */
       that.setState({ loading: false });
-      showPopup({
+      that._showPopup({
         type: "error",
         text: error.message,
         title: "Error inserting registering attendees"

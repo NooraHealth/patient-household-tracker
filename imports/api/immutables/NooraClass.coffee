@@ -22,6 +22,7 @@ BaseNooraClass = Immutable.Record {
   facility_name: '',
   majority_language: '',
   attendees: Immutable.List(),
+  deleted_attendees: Immutable.List(),
   errored_attendees: []
 }
 
@@ -35,65 +36,54 @@ class NooraClass extends BaseNooraClass
   save: ->
     nooraClass = this
     return new Promise ( resolve, reject )->
-      Meteor.call "nooraClass.upsert", nooraClass.toJS(), ( error, results )->
+      json = nooraClass.toJS()
+      Meteor.call "nooraClass.upsert", json, ( error, results )->
         if error
           reject error
         else
-          doc = Classes.findOne({ name: nooraClass.name })
-          Meteor.call "syncWithSalesforce", doc
-          resolve Classes.findOne { name: nooraClass.name }
+          console.log "The results"
+          console.log results
+          doc = Classes.findOne({ _id: results.insertedId })
+          Meteor.call "syncWithSalesforce", doc, json.attendees, json.deleted_attendees
+          resolve doc
 
 if Meteor.isServer
   { SalesforceInterface } = require '../salesforce/SalesforceInterface.coffee'
 
   Meteor.methods
-    "syncWithSalesforce": ( classDoc )->
+
+    "syncWithSalesforce": ( classDoc, attendees, deletedAttendees )->
       console.log "Syncing with salesforce"
+      console.log classDoc
+      console.log attendees
+      console.log deletedAttendees
       toSalesforce = new SalesforceInterface()
-      if classDoc.attendance_report_salesforce_id != '' and classDoc.attendees.length > 0
-        promise = toSalesforce.upsertAttendees(classDoc, classDoc.attendees)
-        promise.then(( results )->
-          console.log "Success exporting attendees"
-          console.log "The errored attendees"
-          console.log results
-          console.log results.errored
-          classDoc.attendees = results.successful
-          classDoc.errored_attendees = results.errored
-          Classes.update { name: classDoc.name }, {$set: classDoc }
-          #TODO: make this clearer that this is to account for errors
-          return toSalesforce.upsertAttendees(classDoc, results.errored)
-        ).then(( results )->
-          console.log "Attendees that were errored and now are not"
-          console.log results
-          classDoc.attendees = classDoc.attendees.concat results.successful
-          classDoc.errored_attendees = results.errored
-          classDoc.export_attendees_error = if results.errored.length > 0 then true else false
-          Classes.update { name: classDoc.name }, {$set: classDoc }
-        , ( err )->
-          Classes.update { name: classDoc.name }, {$set: { export_attendees_error: true }}
-          console.log "error exporting attendees"
-          console.log err
-        )
-      else
-        promise = toSalesforce.exportClass(classDoc);
-        promise.then( (id)->
-          console.log "Success exporting class!! "
-          classDoc.attendance_report_salesforce_id = id
-          Classes.update { name: classDoc.name }, {$set: classDoc }
-          console.log classDoc.attendance_report_salesforce_id
-          return toSalesforce.exportClassEducators(classDoc)
-        ).then(( educators )->
-          console.log "Success exporting class educator objects"
-          classDoc.educators = educators
-          classDoc.export_class_error = false
-          Classes.update { name: classDoc.name }, {$set: classDoc }
-          console.log Classes.findOne { name: classDoc.name }
-        , (err)->
-          console.log "There was an error syncing with salesforce"
-          console.log err
-          Classes.update { name: classDoc.name }, {$set: { export_class_error: true }}
-        )
-    setClassName: ->
+      promise = toSalesforce.exportClass(classDoc)
+      promise.then( (id)->
+        console.log "Success exporting class!! "
+        classDoc.attendance_report_salesforce_id = id
+        Classes.update { name: classDoc.name }, { $set: classDoc }
+        return toSalesforce.exportClassEducators( classDoc )
+      ).then(( educators )->
+        console.log "Success exporting class educator objects"
+        classDoc.educators = educators
+        classDoc.export_class_error = false
+        Classes.update { name: classDoc.name }, {$set: classDoc }
+        return toSalesforce.upsertAttendees(classDoc, attendees)
+      ).then( (results)->
+        console.log "Upserted attendees that were errored and now are not"
+        classDoc.attendees = results.successful
+        classDoc.errored_attendees = classDoc.errored_attendees.concat results.errored
+        Classes.update { name: classDoc.name }, {$set: classDoc }
+        return toSalesforce.deleteAttendees(deletedAttendees)
+      ).then( (results)->
+        console.log "Successfully deleted attendees"
+        console.log results
+      , (err)->
+        console.log "There was an error syncing with salesforce"
+        console.log err
+        Classes.update { name: classDoc.name }, {$set: { export_class_error: true }}
+      )
 
     "nooraClass.upsert": ( nooraClass )->
       getClassName = (doc)->
@@ -106,19 +96,15 @@ if Meteor.isServer
       if not nooraClass.name? or nooraClass.name is ''
         nooraClass.name = getClassName(nooraClass)
 
-      # nooraClass.attendees = nooraClass.attendees.forEach ( attendee )=>
-      #   if not attendee.patient_id? or attendee.patient_id == ''
-      #     attendee.patient_id = getNewPatientId(attendee)
-      #   return attendee
-      #
+      if Classes.findOne({ name: nooraClass.name})
+        throw new Meteor.Error "Duplicate Class", "This class already exists in our database"
+
       facility = Facilities.findOne { name: nooraClass.facility_name }
       if not facility
         throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
       nooraClass.facility_salesforce_id = facility.salesforce_id
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);
-      console.log "Saving this nooraClass"
-      console.log nooraClass
       return Classes.upsert { name: nooraClass.name }, { $set: nooraClass }
 
 module.exports.NooraClass = NooraClass
