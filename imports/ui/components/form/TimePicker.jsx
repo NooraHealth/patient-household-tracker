@@ -17,7 +17,6 @@ const TimePicker = React.createClass({
   },
 
   render() {
-    console.log("Rendering");
     return (
       <div className="ui calendar" ref={(picker)=> this.picker = picker}>
         <div className="ui input left icon">

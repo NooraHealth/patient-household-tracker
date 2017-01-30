@@ -196,6 +196,7 @@ var RegisterAttendeesPage = React.createClass({
       const list = this.state.nooraClass.attendees.set(index, newValues);
       const nooraClass = this.state.nooraClass.set("attendees", list);
       console.log(nooraClass.attendees);
+      console.log(nooraClass.toJS());
       this.setState({ nooraClass: nooraClass })
     }
   },
