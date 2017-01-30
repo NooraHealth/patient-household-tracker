@@ -12,10 +12,8 @@ class SalesforceInterface
   exportClassEducators: ( classDoc )->
     return new Promise (resolve, reject)->
       toExport = classDoc.educators.filter (educator)->
-        id = educator.contact_salesforce_id
-        if id? and id != ''
-          return false
-        else
+        id = educator.class_educator_salesforce_id
+        if not id? or id is ''
           return true
 
       console.log "Exporting these educators:"
@@ -23,12 +21,13 @@ class SalesforceInterface
       console.log toExport
       if toExport.length is 0
         resolve classDoc.educators
+        return
 
       facility = Facilities.findOne {
         salesforce_id: classDoc.facility_salesforce_id
       }
 
-      educators = classDoc.educators.map ( educator )->
+      educators = toExport.map ( educator )->
         doc = Educators.findOne { contact_salesforce_id: educator.contact_salesforce_id }
         return {
           "Name": "Educator: #{doc.first_name} #{doc.last_name} (ID: #{doc.uniqueId})"
@@ -44,9 +43,9 @@ class SalesforceInterface
           reject(err)
         else
           educator.class_educator_salesforce_id = ret.id
-        updatedEducators.push educator
-        if updatedEducators.length == classDoc.educators.length
-          resolve updatedEducators
+          updatedEducators.push educator
+          if updatedEducators.length == toExport.length
+            resolve updatedEducators
 
       #insert into the Salesforce database
       for educator, i in educators
@@ -84,30 +83,44 @@ class SalesforceInterface
           console.log err
           erroredAttendees.push(attendee)
         else
+          console.log "Successfully inserted attendee"
           attendee.contact_salesforce_id = ret.id
           updatedAttendees.push attendee
         if((erroredAttendees.length + updatedAttendees.length) == attendees.length)
+          console.log "About to resolve"
           resolve({ successful: updatedAttendees, errored: erroredAttendees} )
 
-      #insert into the Salesforce database
-      for contact, i in contacts
-        recordId = attendees[i].contact_salesforce_id
+      i = 0
+      upsertNextAttendee = ->
+        console.log "Upserting the attendee #{i}"
+        contact = contacts[i]
+        attendee = attendees[i]
+        recordId = attendee.contact_salesforce_id
         if recordId? and recordId != ''
-          console.log "Updating attendee!!"
+          console.log "Updating"
           contact.Id = recordId
-          Salesforce.sobject("Contact").update contact, "Id", callback.bind(this, attendees[i] )
+          Salesforce.sobject("Contact").update contact, "Id", callback.bind(this, attendee )
         else
-          console.log "inserting attendee"
-          Salesforce.sobject("Contact").insert contact, callback.bind(this, attendees[i] )
+          console.log "inserting"
+          Salesforce.sobject("Contact").insert contact, callback.bind(this, attendee )
+        i = ++i
+        console.log "i == #{i}"
+        console.log this.handle
+        if i is contacts.length
+          console.log "About to clear the interval"
+          console.log this.handle
+          Meteor.clearInterval(this.handle)
+
+      this.handle = Meteor.setInterval(upsertNextAttendee.bind(this), 300)
 
 
   deleteAttendees: ( attendees )->
     return new Promise ( resolve, reject )->
       console.log "Attndees to delete"
+      attendees = attendees.filter (attendee)-> return attendee.contact_salesforce_id? and attendee.contact_salesforce_id != ''
       console.log attendees
       console.log attendees.length
       if attendees.length == 0
-        console.log "REsolving"
         resolve []
       else
         ids = attendees.map (attendee)-> return attendee.contact_salesforce_id
@@ -139,6 +152,7 @@ class SalesforceInterface
       id = nooraClass.attendance_report_salesforce_id
       if id? and id != ''
         resolve( id )
+        return
 
       facility = Facilities.findOne {
         salesforce_id: nooraClass.facility_salesforce_id

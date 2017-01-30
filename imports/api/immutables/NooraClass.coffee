@@ -34,17 +34,29 @@ class NooraClass extends BaseNooraClass
     });
 
   save: ->
-    nooraClass = this
+    nooraClass = this.toJS()
     return new Promise ( resolve, reject )->
-      json = nooraClass.toJS()
-      Meteor.call "nooraClass.upsert", json, ( error, results )->
+      getClassName = ( doc )->
+        suffix = if doc.end_time then " to #{doc.end_time}" else ""
+        return "#{ doc.facility_name }: #{ doc.location } - #{ doc.date }, #{doc.start_time}#{suffix}"
+
+      if not nooraClass.date_created? or nooraClass.date_created is ''
+        nooraClass.date_created = moment().toISOString()
+
+      if not nooraClass.name? or nooraClass.name is ''
+        nooraClass.name = getClassName nooraClass
+        if Classes.findOne({ name: nooraClass.name })
+          reject "This class already exists in our database"
+          return
+
+      Meteor.call "nooraClass.upsert", nooraClass, ( error, results )->
         if error
           reject error
         else
           console.log "The results"
           console.log results
-          doc = Classes.findOne({ _id: results.insertedId })
-          Meteor.call "syncWithSalesforce", doc, json.attendees, json.deleted_attendees
+          doc = Classes.findOne({ name: nooraClass.name })
+          Meteor.call "syncWithSalesforce", doc, nooraClass.attendees, nooraClass.deleted_attendees
           resolve doc
 
 if Meteor.isServer
@@ -53,10 +65,6 @@ if Meteor.isServer
   Meteor.methods
 
     "syncWithSalesforce": ( classDoc, attendees, deletedAttendees )->
-      console.log "Syncing with salesforce"
-      console.log classDoc
-      console.log attendees
-      console.log deletedAttendees
       toSalesforce = new SalesforceInterface()
       promise = toSalesforce.exportClass(classDoc)
       promise.then( (id)->
@@ -86,22 +94,11 @@ if Meteor.isServer
       )
 
     "nooraClass.upsert": ( nooraClass )->
-      getClassName = (doc)->
-        suffix = if doc.end_time then " to #{doc.end_time}" else ""
-        return "#{ doc.facility_name }: #{ doc.location } - #{ doc.date }, #{doc.start_time}#{suffix}"
-
-      if not nooraClass.date_created? or nooraClass.date_created is ''
-        nooraClass.date_created = moment().toISOString()
-
-      if not nooraClass.name? or nooraClass.name is ''
-        nooraClass.name = getClassName(nooraClass)
-
-      if Classes.findOne({ name: nooraClass.name})
-        throw new Meteor.Error "Duplicate Class", "This class already exists in our database"
 
       facility = Facilities.findOne { name: nooraClass.facility_name }
       if not facility
         throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
+
       nooraClass.facility_salesforce_id = facility.salesforce_id
       ClassesSchema.clean(nooraClass)
       ClassesSchema.validate(nooraClass);

@@ -35,7 +35,7 @@ var RegisterAttendeesPage = React.createClass({
     const nooraClass = new NooraClass(this.props.classDoc);
     return {
       loading: false,
-      numRows: this.props.numAttendees,
+      numRows:  nooraClass.attendees.size,
       nooraClass: nooraClass
     }
   },
@@ -45,14 +45,7 @@ var RegisterAttendeesPage = React.createClass({
     if( this.props.editMode ){
       return;
     }
-
-    var list = this.state.nooraClass.attendees;
-    var majorityLanguage = this.state.nooraClass.majority_language;
-    for(var i = 0; i < this.props.numAttendees; i++){
-      list = this._initializeAttendee( i, majorityLanguage );
-    }
-    const nooraClass = this.state.nooraClass.set("attendees", list);
-    this.setState({ nooraClass: nooraClass })
+    this._addAttendees( this.props.numAttendees, this.state.nooraClass.attendees );
   },
 
   renderSingleRow( attendee, i ){
@@ -141,7 +134,7 @@ var RegisterAttendeesPage = React.createClass({
   },
 
   render() {
-    const submitText = "REGISTER ATTENDEES";
+    const submitText = (this.props.editMode)? "SAVE" : "REGISTER ATTENDEES";
     const attendees = this.state.nooraClass.attendees.toArray();
     const that = this;
     let rows = [];
@@ -176,7 +169,7 @@ var RegisterAttendeesPage = React.createClass({
 
         { rows }
         { this.props.editMode &&
-          <button className="ui labeled icon blue button" onClick={ this._addAttendee }>
+          <button className="ui labeled icon blue button" onClick={ this._addAttendees.bind(this, 1) }>
             Add Attendee <i className="large add user icon"></i>
           </button>
         }
@@ -191,28 +184,22 @@ var RegisterAttendeesPage = React.createClass({
         newValues = {};
       }
       newValues[field] = value;
-      console.log("Setting");
-      console.log(newValues);
       const list = this.state.nooraClass.attendees.set(index, newValues);
       const nooraClass = this.state.nooraClass.set("attendees", list);
-      console.log(nooraClass.attendees);
-      console.log(nooraClass.toJS());
       this.setState({ nooraClass: nooraClass })
     }
   },
 
-  _addAttendee(){
-    const index = this.state.numRows;
+  _addAttendees( number ){
     const language = this.state.nooraClass.majority_language;
-    this._initializeAttendee( index, language );
-    this.setState({ "numRows": index+1 });
-  },
-
-  _initializeAttendee( index, language ){
-    console.log("Initializing attendee");
-    console.log(index);
-    console.log(language);
-    this._handleChange(index, "language")(language);
+    let attendees = this.state.nooraClass.attendees;
+    for(var i = 0; i < number; i++){
+      attendees = attendees.push( {'language': language });
+    }
+    const nooraClass = this.state.nooraClass.set("attendees", attendees);
+    const numRows = this.state.numRows + number
+    this.setState({ nooraClass: nooraClass })
+    this.setState({ "numRows": numRows });
   },
 
   _deleteAttendee( index, attendee ){
@@ -261,7 +248,7 @@ var RegisterAttendeesPage = React.createClass({
     const that = this;
 
     const onSaveSuccess = function( nooraClass ){
-      const text = nooraClass.name + ": " + nooraClass.attendees.size + " attendees";
+      const text = nooraClass.name + ": " + nooraClass.attendees.length + " attendees";
       that._showPopup({
         type: "success",
         title: "Attendees Saved Successfully",
