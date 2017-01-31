@@ -12,7 +12,8 @@ class AppConfig
 
     getSupportedLanguages: ->
       return ['English', 'Kannada', 'Hindi', 'Telugu',
-      'Bengali', 'Tamil', 'Malayalam', 'Odiya', 'Konkani', 'Marathi'];
+      'Bengali', 'Tamil', 'Malayalam', 'Odiya', 'Konkani', 'Marathi',
+      'Urdu', 'Tulu'];
 
     getBaseDiagnoses: ->
       return ["CABG", "VSD (ventricular septal defect)",
