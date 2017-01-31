@@ -36,11 +36,8 @@ var AddClassPage = React.createClass({
   },
 
   getInitialState() {
-    console.log("ClasDoc");
     let nooraClass = new NooraClass(this.props.classDoc);
     nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName);
-    console.log(nooraClass);
-    console.log(nooraClass.toJS());
     return {
       loading: false,
       nooraClass: nooraClass
@@ -55,20 +52,12 @@ var AddClassPage = React.createClass({
   },
 
   render() {
-    console.log("Redering");
     let submitText = "SAVE CLASS";
     if( this.state.loading )
       submitText = "...loading..."
     const source = this.props.locations.map( function(location){
         return { title: location };
     });
-
-    let startTime = moment([2016, 1, 1])
-      .add( getHour(this.state.nooraClass.start_time), "hours" )
-      .add( getMinute(this.state.nooraClass.start_time), "minutes" );
-    let endTime = moment([2016, 1, 1])
-      .add( getHour(this.state.nooraClass.end_time), "hours" )
-      .add( getMinute(this.state.nooraClass.end_time), "minutes" );
 
     let dateOfClass = moment( this.state.nooraClass.date )
 
@@ -92,9 +81,7 @@ var AddClassPage = React.createClass({
         }
     });
 
-    console.log(this.state.nooraClass.educators);
     let selectedEducators = this.state.nooraClass.educators.toArray().map((educator)=> {
-        console.log(educator);
         const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });
         return {
           value: doc.contact_salesforce_id,
@@ -168,19 +155,19 @@ var AddClassPage = React.createClass({
             <div className="field">
               <label> Start Time </label>
               <Form.TimePicker
-                value= { startTime }
+                value= { this.state.nooraClass.start_time }
                 placeholder= 'Start Time'
                 showSecond={ false }
-                onChange={ this._onTimeChange.bind(this, "start_time") }
+                onChange={ this._handleChange("start_time") }
               />
             </div>
             <div className="field">
               <label> End Time </label>
               <Form.TimePicker
-                value= { endTime }
+                value= { this.state.nooraClass.start_time }
                 placeholder= 'End Time'
                 showSecond={ false }
-                onChange={ this._onTimeChange.bind(this, "end_time") }
+                onChange={ this._handleChange("end_time") }
               />
             </div>
           </div>

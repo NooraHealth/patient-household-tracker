@@ -27,8 +27,6 @@ BaseNooraClass = Immutable.Record {
 
 class NooraClass extends BaseNooraClass
   constructor: ( properties )->
-    console.log "The educators"
-    console.log properties.educators
     super Object.assign({}, properties, {
       attendees: Immutable.List properties && properties.attendees
     }, {

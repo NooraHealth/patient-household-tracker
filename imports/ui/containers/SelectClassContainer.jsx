@@ -11,9 +11,13 @@ export default SelectClassContainer = createContainer(( params ) => {
 
   console.log(params);
   this._getClasses = function( facilityName ){
-    if( params.mode ){
+    if( params.mode == "editClass" ){
+      return Classes.find({ facility_name: facilityName }).fetch().reverse();
+    }
+    if( params.mode == "editAttendees" ){
       return Classes.find({ facility_name: facilityName, 'attendees.0':{ $exists: true }}).fetch().reverse();
-    } else {
+    }
+    if( params.mode == "addNewAttendees") {
       return Classes.find({ facility_name: facilityName, 'attendees.0':{ $exists: false }}).fetch().reverse();
     }
   };
