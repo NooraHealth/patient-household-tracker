@@ -30,11 +30,12 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
     return filtered;
   };
 
-  const numAttendees = (params.editMode && classDoc)? classDoc.attendees.length: params.numAttendees;
+  const numAttendees = (params.mode == "editAttendees" && classDoc)? classDoc.attendees.length: params.numAttendees;
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     classDoc: classDoc,
     diagnoses: _getDiagnosisOptions( Classes.find({}).fetch() ),
+    mode: params.mode,
     numAttendees: numAttendees,
     supportedLanguages: AppConfig.getSupportedLanguages(),
     currentFacilityName: AppConfig.getFacilityName()

@@ -12,7 +12,7 @@ var SelectClassPage = React.createClass({
   propTypes: {
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
-    editMode: React.PropTypes.bool,
+    mode: React.PropTypes.string,
     classes: React.PropTypes.array
   },
 
@@ -50,7 +50,7 @@ var SelectClassPage = React.createClass({
             options={ classOptions }
             selected={ [{ value: this.state.class_name, name: this.state.class_name}] }
           />
-          { !this.props.editMode &&
+          { this.props.mode == "addNew" &&
               <Form.Input
               type='number'
               key= 'total_number_attended'
@@ -65,12 +65,18 @@ var SelectClassPage = React.createClass({
   },
 
   _onSelectClass(){
-    FlowRouter.go("registerAttendees", {
-      className: this.state.class_name
-    }, {
-      numAttendees: this.state.num_attendees,
-      editMode: this.props.editMode
-    });
+    if( this.props.mode == "editClass" ){
+      FlowRouter.go("editClass", {
+        className: this.state.class_name
+      });
+    } else {
+      FlowRouter.go("registerAttendees", {
+        className: this.state.class_name
+      }, {
+        numAttendees: this.state.num_attendees,
+        mode: this.props.mode
+      });
+    }
   },
 
   _handleChange(field) {

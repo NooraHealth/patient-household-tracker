@@ -20,7 +20,8 @@ var AddClassPage = React.createClass({
     loading: React.PropTypes.bool,
     availableEducators: React.PropTypes.array,
     conditionOperations: React.PropTypes.array,
-    locations: React.PropTypes.array
+    locations: React.PropTypes.array,
+    classDoc: React.PropTypes.object
   },
 
   defaultProps() {
@@ -29,13 +30,17 @@ var AddClassPage = React.createClass({
       locations: [],
       conditionOperations: [],
       availableEducators: [],
-      nooraClass: null,
+      classDoc: {},
       loading: true
     }
   },
 
   getInitialState() {
-    const nooraClass = this.props.nooraClass.set("facility_name", this.props.currentFacilityName);
+    console.log("ClasDoc");
+    let nooraClass = new NooraClass(this.props.classDoc);
+    nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName);
+    console.log(nooraClass);
+    console.log(nooraClass.toJS());
     return {
       loading: false,
       nooraClass: nooraClass
@@ -87,6 +92,7 @@ var AddClassPage = React.createClass({
         }
     });
 
+    console.log(this.state.nooraClass.educators);
     let selectedEducators = this.state.nooraClass.educators.toArray().map((educator)=> {
         console.log(educator);
         const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });

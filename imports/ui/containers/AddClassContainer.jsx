@@ -20,6 +20,10 @@ export default AddClassContainer = createContainer(( params ) => {
     return ConditionOperations.find({ facility_name: facilityName }).fetch();
   };
 
+  this._getClass = function( name ) {
+    return Classes.findOne({ name: name });
+  };
+
   this._getClassLocations = function( classes ) {
     const locations = classes.map( function( nooraClass ) {
       return nooraClass.location;
@@ -36,7 +40,7 @@ export default AddClassContainer = createContainer(( params ) => {
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     locations: _getClassLocations( Classes.find({ facility_name: AppConfig.getFacilityName() }).fetch() ),
-    nooraClass: new NooraClass(),
+    classDoc: _getClass(params.className),
     supportedLanguages: AppConfig.getSupportedLanguages(),
     availableEducators: _getAvailableEducators( AppConfig.getFacilityName() ),
     conditionOperations: _getConditionOperations( AppConfig.getFacilityName() ),

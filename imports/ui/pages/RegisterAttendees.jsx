@@ -15,7 +15,7 @@ var RegisterAttendeesPage = React.createClass({
   propTypes: {
     currentFacilityName: React.PropTypes.string,
     loading: React.PropTypes.bool,
-    editMode: React.PropTypes.bool,
+    mode: React.PropTypes.string,
     numAttendees: React.PropTypes.number,
     diagnoses: React.PropTypes.array,
     classDoc: React.PropTypes.object
@@ -26,7 +26,7 @@ var RegisterAttendeesPage = React.createClass({
       currentFacilityName: "",
       numAttendees: 0,
       loading: true,
-      editMode: false,
+      mode: "addNewAttendees",
       classDoc: {}
     }
   },
@@ -42,7 +42,7 @@ var RegisterAttendeesPage = React.createClass({
 
   componentDidMount(){
     /* set default language for all attendees */
-    if( this.props.editMode ){
+    if( this.props.mode == "editAttendees" ){
       return;
     }
     this._addAttendees( this.props.numAttendees, this.state.nooraClass.attendees );
@@ -68,7 +68,7 @@ var RegisterAttendeesPage = React.createClass({
       <br/>
       <div className="ui dividing header">
           Attendee { i+1 }
-          { this.props.editMode &&
+          { this.props.mode == "addNewAttendees" &&
             <button className="ui icon red button add-margin" onClick={ this._deleteAttendee.bind(this, i, attendee) }>
               <i className="trash icon"></i>
             </button>
@@ -134,7 +134,7 @@ var RegisterAttendeesPage = React.createClass({
   },
 
   render() {
-    const submitText = (this.props.editMode)? "SAVE" : "REGISTER ATTENDEES";
+    const submitText = (this.props.mode == "editAttendees" )? "SAVE" : "REGISTER ATTENDEES";
     const attendees = this.state.nooraClass.attendees.toArray();
     const that = this;
     let rows = [];
@@ -168,7 +168,7 @@ var RegisterAttendeesPage = React.createClass({
         </div>
 
         { rows }
-        { this.props.editMode &&
+        { this.props.mode == "editAttendees" &&
           <button className="ui labeled icon blue button" onClick={ this._addAttendees.bind(this, 1) }>
             Add Attendee <i className="large add user icon"></i>
           </button>

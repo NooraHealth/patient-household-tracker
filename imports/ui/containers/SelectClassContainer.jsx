@@ -11,7 +11,7 @@ export default SelectClassContainer = createContainer(( params ) => {
 
   console.log(params);
   this._getClasses = function( facilityName ){
-    if( params.editMode ){
+    if( params.mode ){
       return Classes.find({ facility_name: facilityName, 'attendees.0':{ $exists: true }}).fetch().reverse();
     } else {
       return Classes.find({ facility_name: facilityName, 'attendees.0':{ $exists: false }}).fetch().reverse();
@@ -20,7 +20,7 @@ export default SelectClassContainer = createContainer(( params ) => {
 
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
-    editMode: params.editMode,
+    mode: params.mode,
     classes: _getClasses( AppConfig.getFacilityName() ),
     currentFacilityName: AppConfig.getFacilityName()
   };

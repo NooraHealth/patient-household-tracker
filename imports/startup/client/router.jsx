@@ -33,14 +33,28 @@ FlowRouter.route('/addClass', {
   }
 });
 
-FlowRouter.route('/selectClass/:editMode', {
+
+FlowRouter.route('/selectClass/:mode', {
   name: "selectClass",
   action: function( params ){
     mount( MainLayout, {
       nav_components: <BackButton key='back_button'/>,
       content: <SelectClassContainer
         key='select_class_page'
-        editMode={ params.editMode == "edit" }
+        mode={ params.mode }
+        />
+    });
+  }
+});
+
+FlowRouter.route('/editClass/:className', {
+  name: "editClass",
+  action: function( params ){
+    mount( MainLayout, {
+      nav_components: <BackButton key='back_button'/>,
+      content: <AddClassContainer
+        key='edit_class_page'
+        className={ params.className }
         />
     });
   }
