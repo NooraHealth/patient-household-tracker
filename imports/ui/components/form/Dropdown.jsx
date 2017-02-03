@@ -81,7 +81,7 @@ var Dropdown = React.createClass({
   },
 
   _getValues( options ){
-    return options.map((selected)=>{ return selected.value });
+    return options.map((selected)=>{ return selected.name });
   }
 
 });

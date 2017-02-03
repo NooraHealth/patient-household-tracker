@@ -43,6 +43,8 @@ var RegisterAttendeesPage = React.createClass({
   componentDidMount(){
     /* set default language for all attendees */
     if( this.props.mode == "editAttendees" ){
+      console.log("MODE");
+      console.log(this.props.mode);
       return;
     }
     this._addAttendees( this.props.numAttendees, this.state.nooraClass.attendees );
@@ -68,7 +70,7 @@ var RegisterAttendeesPage = React.createClass({
       <br/>
       <div className="ui dividing header">
           Attendee { i+1 }
-          { this.props.mode == "addNewAttendees" &&
+          { this.props.mode == "editAttendees" &&
             <button className="ui icon red button add-margin" onClick={ this._deleteAttendee.bind(this, i, attendee) }>
               <i className="trash icon"></i>
             </button>
@@ -262,8 +264,8 @@ var RegisterAttendeesPage = React.createClass({
       that.setState({ loading: false });
       that._showPopup({
         type: "error",
-        text: error.message,
-        title: "Error inserting registering attendees"
+        text: error,
+        title: "Error registering attendees"
       });
     }
     this.state.nooraClass.save().then( results => onSaveSuccess(results), error => onSaveError(error))

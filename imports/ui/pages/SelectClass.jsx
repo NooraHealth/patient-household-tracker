@@ -50,7 +50,7 @@ var SelectClassPage = React.createClass({
             options={ classOptions }
             selected={ [{ value: this.state.class_name, name: this.state.class_name}] }
           />
-          { this.props.mode == "addNew" &&
+          { this.props.mode == "addNewAttendees" &&
               <Form.Input
               type='number'
               key= 'total_number_attended'

@@ -68,7 +68,7 @@ FlowRouter.route('/registerAttendees/:className', {
       content: <RegisterAttendeesContainer
         key='register_attendees_page'
         className={ params.className }
-        editMode={ queryParams.editMode == "true" }
+        mode={ queryParams.mode }
         numAttendees={ parseInt(queryParams.numAttendees) }
         />
     });

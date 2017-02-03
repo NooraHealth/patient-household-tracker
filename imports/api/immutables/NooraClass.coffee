@@ -16,6 +16,7 @@ BaseNooraClass = Immutable.Record {
   total_patients: 0,
   total_family_members: 0,
   educators: Immutable.List(),
+  deleted_educators: Immutable.List(),
   facility_salesforce_id: '',
   condition_operation_salesforce_id: '',
   attendance_report_salesforce_id: '',
@@ -43,20 +44,15 @@ class NooraClass extends BaseNooraClass
       if not nooraClass.date_created? or nooraClass.date_created is ''
         nooraClass.date_created = moment().toISOString()
 
-      if not nooraClass.name? or nooraClass.name is ''
-        nooraClass.name = getClassName nooraClass
-        if Classes.findOne({ name: nooraClass.name })
-          reject "This class already exists in our database"
-          return
+      # if not nooraClass.name? or nooraClass.name is ''
+      nooraClass.name = getClassName nooraClass
 
       Meteor.call "nooraClass.upsert", nooraClass, ( error, results )->
         if error
           reject error
         else
-          console.log "The results"
-          console.log results
           doc = Classes.findOne({ name: nooraClass.name })
-          Meteor.call "syncWithSalesforce", doc, nooraClass.attendees, nooraClass.deleted_attendees
+          Meteor.call "syncWithSalesforce", doc, nooraClass.deleted_attendees, nooraClass.deleted_educators
           resolve doc
 
 if Meteor.isServer
@@ -64,28 +60,42 @@ if Meteor.isServer
 
   Meteor.methods
 
-    "syncWithSalesforce": ( classDoc, attendees, deletedAttendees )->
+    "syncWithSalesforce": ( classDoc, deletedAttendees, deletedEducators )->
       toSalesforce = new SalesforceInterface()
-      promise = toSalesforce.exportClass(classDoc)
+      promise = toSalesforce.upsertClass(classDoc)
       promise.then( (id)->
         console.log "Success exporting class!! "
         classDoc.attendance_report_salesforce_id = id
         Classes.update { name: classDoc.name }, { $set: classDoc }
-        return toSalesforce.exportClassEducators( classDoc )
+        return toSalesforce.exportClassEducators( classDoc.educators, classDoc.facility_salesforce_id, classDoc.attendance_report_salesforce_id )
       ).then(( educators )->
         console.log "Success exporting class educator objects"
+        console.log educators
         classDoc.educators = educators
-        classDoc.export_class_error = false
-        Classes.update { name: classDoc.name }, {$set: classDoc }
-        return toSalesforce.upsertAttendees(classDoc, attendees)
+        Classes.update { name: classDoc.name }, { $set: classDoc }
+        filtered = deletedEducators.filter (educator)->
+          id = educator.class_educator_salesforce_id
+          return id? and id != ''
+        console.log "The deleted!!"
+        console.log deletedEducators
+        console.log "The filtered"
+        console.log filtered
+        toDelete = filtered.map (educator) -> return educator.class_educator_salesforce_id
+        return toSalesforce.deleteRecords(toDelete, "Class_Educator__c")
+      ).then(( educators )->
+        console.log "Success deleting class educator objects"
+        return toSalesforce.upsertAttendees(classDoc, classDoc.attendees)
       ).then( (attendees)->
-        console.log "Upserted attendees that were errored and now are not"
+        console.log "Successfully upserted Attendees"
         classDoc.attendees = attendees
         Classes.update { name: classDoc.name }, {$set: classDoc }
-        return toSalesforce.deleteAttendees(deletedAttendees)
+        filtered = deletedAttendees.filter (attendee)->
+          id = attendee.contact_salesforce_id
+          return id? and id != ''
+        toDelete = filtered.map (attendee) -> return attendee.contact_salesforce_id
+        return toSalesforce.deleteRecords(toDelete, "Contact")
       ).then( (results)->
         console.log "Successfully deleted attendees"
-        console.log results
       , (err)->
         console.log "There was an error syncing with salesforce"
         console.log err

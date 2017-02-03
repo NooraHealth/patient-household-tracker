@@ -46,8 +46,12 @@ var AddClassPage = React.createClass({
 
   componentDidUpdate(prevProps, prevState) {
     if( this.props.currentFacilityName !== prevProps.currentFacilityName){
-      let nooraClass = this.state.nooraClass.set("facility_name", this.props.currentFacilityName );
+      let nooraClass = this._clearEducators();
+      nooraClass = nooraClass.set("condition_operation_salesforce_id", '');
+      nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName );
       this.setState({ nooraClass: nooraClass });
+      console.log("Cleared!!");
+      console.log(this.state.nooraClass.toJS());
     }
   },
 
@@ -164,7 +168,7 @@ var AddClassPage = React.createClass({
             <div className="field">
               <label> End Time </label>
               <Form.TimePicker
-                value= { this.state.nooraClass.start_time }
+                value= { this.state.nooraClass.end_time }
                 placeholder= 'End Time'
                 showSecond={ false }
                 onChange={ this._handleChange("end_time") }
@@ -228,11 +232,39 @@ var AddClassPage = React.createClass({
   },
 
   _onEducatorChange( educatorSalesforceIds ){
+    const currentEducators = this.state.nooraClass.educators;
+    const oldIds = currentEducators.toArray().map((educator)=>{ return educator.contact_salesforce_id });
     var newList = Immutable.List();
-    educatorSalesforceIds.forEach(function( id ){
+    let deleted = this.state.nooraClass.deleted_educators;
+    let leftOverIds = educatorSalesforceIds;
+    for (var i = 0; i < oldIds.length; i++) {
+      let indexOfId = educatorSalesforceIds.indexOf(oldIds[i]);
+      //If the oldId exists in the new list
+      if( indexOfId != -1 ){
+        //Push onto new list
+        newList = newList.push( this.state.nooraClass.educators.get(i));
+        leftOverIds.splice(indexOfId, 1);
+      } else {
+        deleted = deleted.push(currentEducators.get(i));
+      }
+    }
+    leftOverIds.forEach(function( id ){
       newList = newList.push({ contact_salesforce_id: id });
     });
+    const nooraClass = this.state.nooraClass.set("deleted_educators", deleted);
+    this.setState({ nooraClass: nooraClass });
     this._handleChange("educators")(newList);
+  },
+
+  _clearEducators(){
+    let educators = this.state.nooraClass.educators;
+    let deleted = this.state.nooraClass.deleted_educators;
+    for (var i = 0; i < educators.size; i++) {
+      deleted = deleted.push(educators.get(i));
+    }
+    const cleared = educators.clear();
+    let nooraClass = this.state.nooraClass.set("educators", cleared);
+    return nooraClass.set("deleted_educators", deleted);
   },
 
   _onDateChange( value ){

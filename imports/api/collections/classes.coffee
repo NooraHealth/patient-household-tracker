@@ -21,6 +21,7 @@ ClassesSchema = new SimpleSchema
   condition_operation_salesforce_id:
     type: String
     defaultValue: ""
+    min: 2
   facility_salesforce_id:
     type: String
     defaultValue: ""
