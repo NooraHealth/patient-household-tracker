@@ -50,8 +50,6 @@ var AddClassPage = React.createClass({
       nooraClass = nooraClass.set("condition_operation_salesforce_id", '');
       nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName );
       this.setState({ nooraClass: nooraClass });
-      console.log("Cleared!!");
-      console.log(this.state.nooraClass.toJS());
     }
   },
 
@@ -269,10 +267,6 @@ var AddClassPage = React.createClass({
 
   _onDateChange( value ){
     this._handleChange("date")(value.format("YYYY-MM-DD"));
-  },
-
-  _onTimeChange( field, value ){
-    this._handleChange(field)(moment(value).format("HH:mm"));
   },
 
   _saveClass() {

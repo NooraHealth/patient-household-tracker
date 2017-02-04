@@ -49,11 +49,6 @@ class SalesforceInterface
           educator.export_error = null
           educator.class_educator_salesforce_id = ret.id
         updatedEducators.push educator
-        console.log "The updated educators!"
-        console.log updatedEducators
-        console.log "The educators"
-        console.log educators
-
         if updatedEducators.length == toExport.length
           educators = educators.map (educator, i)->
             for updatedEducator in updatedEducators
@@ -71,8 +66,6 @@ class SalesforceInterface
 
       #insert into the Salesforce database
       for classEducator, i in classEducatorObjects
-        console.log "The class educator object"
-        console.log classEducator
         Salesforce.sobject("Class_Educator__c").insert classEducator, callback.bind(this, toExport[i] )
 
   upsertAttendees: ( classDoc, attendees )->
