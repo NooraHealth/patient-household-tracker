@@ -28,14 +28,15 @@ var SelectClassPage = React.createClass({
     return {
       loading: false,
       class_name: '',
-      num_attendees: ''
+      num_attendees: '',
+      reportId: ''
     }
   },
 
   render() {
     const submitText = "SELECT CLASS"
     const classOptions = this.props.classes.map(function(nooraClass) {
-      return { value: nooraClass.name, name: nooraClass.name };
+      return { value: nooraClass.attendance_report_salesforce_id, name: nooraClass.name };
     });
 
     return (
@@ -46,9 +47,9 @@ var SelectClassPage = React.createClass({
             key= 'class_name'
             label="Select Class"
             icon="search icon"
-            onChange={ this._handleChange("class_name") }
+            onChange={ this._handleChange("reportId") }
             options={ classOptions }
-            selected={ [{ value: this.state.class_name, name: this.state.class_name}] }
+            selected={ [{ value: this.state.reportId, name: this.state.class_name}] }
           />
           { this.props.mode == "addNewAttendees" &&
               <Form.Input
@@ -67,11 +68,11 @@ var SelectClassPage = React.createClass({
   _onSelectClass(){
     if( this.props.mode == "editClass" ){
       FlowRouter.go("editClass", {
-        className: this.state.class_name
+        reportId: this.state.reportId
       });
     } else {
       FlowRouter.go("registerAttendees", {
-        className: this.state.class_name
+        reportId: this.state.reportId
       }, {
         numAttendees: this.state.num_attendees,
         mode: this.props.mode

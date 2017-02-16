@@ -84,12 +84,14 @@ var AddClassPage = React.createClass({
     });
 
     let selectedEducators = this.state.nooraClass.educators.toArray().map((educator)=> {
-        const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });
+        console.log("educator");
+        console.log(educator);
         return {
-          value: doc.contact_salesforce_id,
-          name: doc.first_name + " " + doc.last_name + " ID: " + doc.uniqueId
+          value: educator.contact_salesforce_id,
+          name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
         }
     });
+    console.log(selectedEducators);
 
     let languageOptions = this.props.supportedLanguages.map( function(language){
         return { value: language, name: language };
@@ -249,6 +251,8 @@ var AddClassPage = React.createClass({
     leftOverIds.forEach(function( id ){
       newList = newList.push({ contact_salesforce_id: id });
     });
+    console.log("New list");
+    console.log(newList);
     const nooraClass = this.state.nooraClass.set("deleted_educators", deleted);
     this.setState({ nooraClass: nooraClass });
     this._handleChange("educators")(newList);
@@ -277,13 +281,24 @@ var AddClassPage = React.createClass({
       }, 100 );
     };
 
-    const onSaveSuccess = function( nooraClass ){
-      const text = nooraClass.name;
+    const onSaveSuccess = function( results ){
+      let text = results.doc.name + " saved and synced successfully";
+      if ( results.syncErrors && results.syncErrors.length > 0) {
+        const errors = results.syncErrors.map((err) => {
+          let str = '';
+          for ( let key in err ){
+            str += key + ": " + err[key];
+          }
+          return "<li>" + str + "</li>"
+        });
+        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul>";
+      }
       that._clearForm();
       showPopup({
         type: "success",
         title: "Class Saved Successfully",
-        text: text
+        text: text,
+        html: true
       });
       FlowRouter.go("home");
     };

@@ -32,19 +32,24 @@ var Dropdown = React.createClass({
   componentDidMount() {
     const onChange = this.props.onChange;
     $(this.dropdown).dropdown({
+      allowAdditions: true,
       onChange: function(value, text, selectedItem) {
         onChange(value);
       },
       fullTextSearch: true
     });
     const values = this._getValues(this.props.selected);
-    $(this.dropdown).dropdown("set exactly", values);
+    console.log("Selected");
+    console.log(this.props.selected);
+    console.log("Setting the values");
+    console.log(values);
+    $(this.dropdown).dropdown("set selected", values);
   },
 
   componentDidUpdate(prevProps, prevState) {
     if( JSON.stringify(this.props.selected) !== JSON.stringify(prevProps.selected)){
       const values = this._getValues(this.props.selected);
-      $(this.dropdown).dropdown("set exactly", values);
+      $(this.dropdown).dropdown("set selected", values);
     }
   },
 
@@ -70,6 +75,7 @@ var Dropdown = React.createClass({
         >
         <label>{ label }</label>
         <select
+          multiple=''
           className={ getClasses() }
           ref={ (elem)=> this.dropdown = elem }
           >
@@ -81,7 +87,7 @@ var Dropdown = React.createClass({
   },
 
   _getValues( options ){
-    return options.map((selected)=>{ return selected.name });
+    return options.map((selected)=>{ return selected.value });
   }
 
 });

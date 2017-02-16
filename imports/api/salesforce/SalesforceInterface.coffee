@@ -14,11 +14,6 @@ class SalesforceInterface
       toExport = educators.filter (educator)->
         id = educator.class_educator_salesforce_id
         return !(id? and id != '')
-      console.log "original educators"
-      console.log educators
-
-      console.log "Exporting these educators"
-      console.log toExport
       if toExport.length is 0
         resolve( educators )
         return
@@ -36,16 +31,13 @@ class SalesforceInterface
       }
 
       updatedEducators = []
+      errors = []
       callback = Meteor.bindEnvironment ( educator, err, ret ) ->
-        console.log "The return"
-        console.log err
-        console.log ret
         if err
-          educator.export_error = err
           console.log "ERror exporting class educators!!"
           console.log err
+          errors.push { "Error exporting class educator": err.name }
         else
-          console.log "Changing the stuff on the educatro"
           educator.export_error = null
           educator.class_educator_salesforce_id = ret.id
         updatedEducators.push educator
@@ -53,16 +45,10 @@ class SalesforceInterface
           educators = educators.map (educator, i)->
             for updatedEducator in updatedEducators
               if updatedEducator? and updatedEducator.contact_salesforce_id == educator.contact_salesforce_id
-                console.log "Returning the updated educator"
-                console.log updatedEducator
                 return updatedEducator
               else
-                console.log "returning the educator"
-                console.log educator
                 return educator
-          console.log "The educatorsj"
-          console.log educators
-          resolve educators
+          resolve { educators: educators, errors: errors }
 
       #insert into the Salesforce database
       for classEducator, i in classEducatorObjects
@@ -72,7 +58,7 @@ class SalesforceInterface
     return new Promise (resolve, reject)->
       console.log "Upserting attendees"
       if attendees.length is 0
-        resolve []
+        resolve { result: [], errors: [] }
         return
 
       facility = Facilities.findOne {
@@ -94,11 +80,12 @@ class SalesforceInterface
       }
 
       updatedAttendees = []
+      errors = []
       callback = Meteor.bindEnvironment ( attendee, err, ret ) ->
         if err
           console.log "Error exporting class attendees"
           console.log err
-          attendee.export_error = err
+          errors.push { "Error exporting class attendee": err.name }
         else
           "Successfully exported"
           attendee.export_error = null
@@ -107,7 +94,7 @@ class SalesforceInterface
         console.log "updated attendees"
         console.log updatedAttendees
         if updatedAttendees.length == attendees.length
-          resolve( updatedAttendees )
+          resolve( { attendees: updatedAttendees, errors: errors } )
 
       i = 0
       upsertNextAttendee = ->
@@ -128,23 +115,21 @@ class SalesforceInterface
 
   deleteRecords: (ids, objectName )->
     return new Promise (resolve, reject)->
-      console.log "Deleting records"
-      console.log ids
       if ids.length is 0
-        resolve()
+        resolve({})
       else
         deleted = 0
+        errors = []
         for id in ids
           Salesforce.sobject(objectName).destroy id, (err, ret)->
             if err
               console.log "Error deleting record #{id}"
-              console.log err
-              reject err
+              errors.push { "Error deleting #{objectName} #{id}": err.name }
             else
               console.log "Successfully deleted the record #{id}"
             deleted = ++deleted
             if deleted == ids.length
-              resolve()
+              resolve({ errors: errors, deleted: ids })
 
   upsertClass: ( nooraClass )->
     return new Promise (resolve, reject)->
@@ -169,11 +154,11 @@ class SalesforceInterface
         if err
           console.log "Error exporting class"
           console.log err
-          reject(err)
+          resolve({ errors: [{ "Error exporting/updating class": err.name }]})
         else
           console.log "ret"
           console.log ret.id
-          resolve(ret.id)
+          resolve({ id: ret.id })
 
       #insert into the Salesforce database
       id = nooraClass.attendance_report_salesforce_id

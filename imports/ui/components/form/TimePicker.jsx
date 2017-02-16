@@ -54,13 +54,10 @@ const TimePicker = React.createClass({
 
   _onChange( value ){
     const time = (value)? moment(value).format("HH:mm"): null;
-    console.log("Setting time to " + time);
     this.props.onChange( time );
   },
 
   _setTime( time ){
-    console.log("SETTING THE TIME");
-    console.log(time);
     const formattedTime = ( time == null )? "" : this._getMoment(time).toDate();
     $(this.picker).calendar("set date", formattedTime );
   }

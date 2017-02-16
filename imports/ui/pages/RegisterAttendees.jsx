@@ -43,8 +43,6 @@ var RegisterAttendeesPage = React.createClass({
   componentDidMount(){
     /* set default language for all attendees */
     if( this.props.mode == "editAttendees" ){
-      console.log("MODE");
-      console.log(this.props.mode);
       return;
     }
     this._addAttendees( this.props.numAttendees, this.state.nooraClass.attendees );
@@ -249,12 +247,24 @@ var RegisterAttendeesPage = React.createClass({
   _registerAttendees() {
     const that = this;
 
-    const onSaveSuccess = function( nooraClass ){
-      const text = nooraClass.name + ": " + nooraClass.attendees.length + " attendees";
+    const onSaveSuccess = function( results ){
+      const numAttendees = ( results.doc.attendees )? results.doc.attendees.length: 0 ;
+      let text = results.doc.name + ": " + numAttendees + " attendees";
+      if ( results.syncErrors && results.syncErrors.length > 0) {
+        const errors = results.syncErrors.map((err) => {
+          let str = '';
+          for ( let key in err ){
+            str += key + ": " + err[key];
+          }
+          return "<li>" + str + "</li>"
+        });
+        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul>";
+      }
       that._showPopup({
         type: "success",
         title: "Attendees Saved Successfully",
-        text: text
+        text: text,
+        html: true
       });
       FlowRouter.go("home");
     };

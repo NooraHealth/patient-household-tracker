@@ -20,8 +20,21 @@ export default AddClassContainer = createContainer(( params ) => {
     return ConditionOperations.find({ facility_name: facilityName }).fetch();
   };
 
-  this._getClass = function( name ) {
-    return Classes.findOne({ name: name });
+  this._getClass = function( reportId ) {
+    let nooraClass = Classes.findOne({ attendance_report_salesforce_id: reportId });
+    console.log("nooraClass");
+    console.log(nooraClass);
+    if( !nooraClass ) return nooraClass;
+    nooraClass.educators = nooraClass.educators.map((educator) => {
+      const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });
+      if( doc ){
+        educator.first_name = doc.first_name;
+        educator.last_name = doc.last_name;
+        educator.uniqueId = doc.uniqueId;
+      }
+      return educator;
+    });
+    return nooraClass;
   };
 
   this._getClassLocations = function( classes ) {
@@ -40,7 +53,7 @@ export default AddClassContainer = createContainer(( params ) => {
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
     locations: _getClassLocations( Classes.find({ facility_name: AppConfig.getFacilityName() }).fetch() ),
-    classDoc: _getClass(params.className),
+    classDoc: _getClass(params.reportId),
     supportedLanguages: AppConfig.getSupportedLanguages(),
     availableEducators: _getAvailableEducators( AppConfig.getFacilityName() ),
     conditionOperations: _getConditionOperations( AppConfig.getFacilityName() ),

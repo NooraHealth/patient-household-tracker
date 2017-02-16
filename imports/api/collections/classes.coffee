@@ -1,11 +1,19 @@
 
+{ Educators } = require "./educators"
+moment = require 'moment'
 Classes = new Mongo.Collection Meteor.settings.public.classes_collection
 
 ClassesSchema = new SimpleSchema
   name:
     type: String
-    defaultValue: ""
-    unique: true
+    autoValue: ()->
+      endTime = if this.field("end_time").isSet then this.field("end_time").value else null
+      startTime = this.field("start_time").value
+      facilityName = this.field("facility_name").value
+      location = this.field("location").value
+      date = this.field("date").value
+      suffix = if endTime then " to #{ endTime }" else ""
+      return "#{ facilityName }: #{ location } - #{ date }, #{ startTime }#{ suffix }"
   location:
     type: String
     defaultValue: ""
@@ -27,14 +35,17 @@ ClassesSchema = new SimpleSchema
     defaultValue: ""
   attendance_report_salesforce_id:
     type: String
-    defaultValue: ""
-    optional: true
+    unique: true
   facility_name:
     type: String
     defaultValue: ""
   date_created:
     type: String
-    defaultValue: ""
+    autoValue: ()->
+      console.log "Getting the date created"
+      console.log this
+      if not this.value
+        return moment().toISOString()
   date:
     type: String
     defaultValue: ""
@@ -45,28 +56,34 @@ ClassesSchema = new SimpleSchema
     type: String
     defaultValue: ""
     optional:true
-  export_class_error:
-    type: Boolean
-    defaultValue: false
+  errors:
+    type: [Object]
     optional: true
-  export_attendees_error:
-    type: Boolean
-    defaultValue: false
-    optional: true
+    blackbox: true
   #TODO: Make all references to salesforce ids the same term
   "educators.$.contact_salesforce_id":
     type: String
-  "educators.$.error_exporting":
-    type: [Object]
+    custom: ->
+      console.log "Custom validation of educators"
+      educator = Educators.findOne { contact_salesforce_id: this.value }
+      console.log educator
+      if not educator
+        console.log "Not educator!"
+        return "notAllowed"
+  "educators.$.first_name":
+    type: String
+    optional: true
+  "educators.$.last_name":
+    type: String
+    optional: true
+  "educators.$.uniqueId":
+    type: String
     optional: true
   "educators.$.class_educator_salesforce_id":
     type: String
     optional: true
   "attendees.$.name":
     type: String
-  "attendees.$.error_exporting":
-    type: [Object]
-    optional: true
   "attendees.$.contact_salesforce_id":
     type: String
     defaultValue: ''

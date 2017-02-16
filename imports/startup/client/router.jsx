@@ -47,27 +47,27 @@ FlowRouter.route('/selectClass/:mode', {
   }
 });
 
-FlowRouter.route('/editClass/:className', {
+FlowRouter.route('/editClass/:reportId', {
   name: "editClass",
   action: function( params ){
     mount( MainLayout, {
       nav_components: <BackButton key='back_button'/>,
       content: <AddClassContainer
         key='edit_class_page'
-        className={ params.className }
+        reportId={ params.reportId }
         />
     });
   }
 });
 
-FlowRouter.route('/registerAttendees/:className', {
+FlowRouter.route('/registerAttendees/:reportId', {
   name: "registerAttendees",
   action: function( params, queryParams ){
     mount( MainLayout, {
       nav_components: <BackButton key='back_button'/>,
       content: <RegisterAttendeesContainer
         key='register_attendees_page'
-        className={ params.className }
+        reportId={ params.reportId }
         mode={ queryParams.mode }
         numAttendees={ parseInt(queryParams.numAttendees) }
         />
