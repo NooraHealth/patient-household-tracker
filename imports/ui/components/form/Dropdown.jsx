@@ -32,17 +32,13 @@ var Dropdown = React.createClass({
   componentDidMount() {
     const onChange = this.props.onChange;
     $(this.dropdown).dropdown({
-      allowAdditions: true,
+      allowAdditions: false,
       onChange: function(value, text, selectedItem) {
         onChange(value);
       },
       fullTextSearch: true
     });
     const values = this._getValues(this.props.selected);
-    console.log("Selected");
-    console.log(this.props.selected);
-    console.log("Setting the values");
-    console.log(values);
     $(this.dropdown).dropdown("set selected", values);
   },
 

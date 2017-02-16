@@ -6,6 +6,7 @@ import Immutable from 'immutable'
 import { Form } from '../components/form/base/Form.jsx';
 import { Educators } from '../../api/collections/educators.coffee';
 import { ConditionOperations } from '../../api/collections/condition_operations.coffee';
+import { Facilities } from '../../api/collections/facilities.coffee';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { getHour } from '../../api/utils.coffee';
 import { getMinute } from '../../api/utils.coffee';
@@ -38,6 +39,7 @@ var AddClassPage = React.createClass({
   getInitialState() {
     let nooraClass = new NooraClass(this.props.classDoc);
     nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName);
+    nooraClass = nooraClass.set("facility_salesforce_id", this.props.facilitySalesforceId);
     return {
       loading: false,
       nooraClass: nooraClass
@@ -45,10 +47,17 @@ var AddClassPage = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
+    console.log("Component did updated");
+    console.log(this.state.nooraClass.facility_salesforce_id);
+    console.log(this.state.nooraClass.facility_name);
     if( this.props.currentFacilityName !== prevProps.currentFacilityName){
+      console.log("UPDATING ALL THE FACILITY STUFF");
       let nooraClass = this._clearEducators();
       nooraClass = nooraClass.set("condition_operation_salesforce_id", '');
       nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName );
+      nooraClass = nooraClass.set("facility_salesforce_id", this.props.facilitySalesforceId);
+      console.log("After update");
+      console.log(nooraClass.facility_salesforce_id);
       this.setState({ nooraClass: nooraClass });
     }
   },
@@ -84,14 +93,11 @@ var AddClassPage = React.createClass({
     });
 
     let selectedEducators = this.state.nooraClass.educators.toArray().map((educator)=> {
-        console.log("educator");
-        console.log(educator);
         return {
           value: educator.contact_salesforce_id,
           name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
         }
     });
-    console.log(selectedEducators);
 
     let languageOptions = this.props.supportedLanguages.map( function(language){
         return { value: language, name: language };

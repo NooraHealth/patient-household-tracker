@@ -22,8 +22,6 @@ export default AddClassContainer = createContainer(( params ) => {
 
   this._getClass = function( reportId ) {
     let nooraClass = Classes.findOne({ attendance_report_salesforce_id: reportId });
-    console.log("nooraClass");
-    console.log(nooraClass);
     if( !nooraClass ) return nooraClass;
     nooraClass.educators = nooraClass.educators.map((educator) => {
       const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });
@@ -57,7 +55,8 @@ export default AddClassContainer = createContainer(( params ) => {
     supportedLanguages: AppConfig.getSupportedLanguages(),
     availableEducators: _getAvailableEducators( AppConfig.getFacilityName() ),
     conditionOperations: _getConditionOperations( AppConfig.getFacilityName() ),
-    currentFacilityName: AppConfig.getFacilityName()
+    currentFacilityName: AppConfig.getFacilityName(),
+    facilitySalesforceId: AppConfig.getFacilityId()
   };
 }, AddClassPage);
 

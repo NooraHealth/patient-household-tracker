@@ -16,29 +16,23 @@ ClassesSchema = new SimpleSchema
       return "#{ facilityName }: #{ location } - #{ date }, #{ startTime }#{ suffix }"
   location:
     type: String
-    defaultValue: ""
   majority_language:
     type: String
-    defaultValue: ""
   total_patients:
     type: Number
-    defaultValue: ""
   total_family_members:
     type: Number
-    defaultValue: ""
   condition_operation_salesforce_id:
     type: String
-    defaultValue: ""
     min: 2
   facility_salesforce_id:
     type: String
-    defaultValue: ""
   attendance_report_salesforce_id:
     type: String
     unique: true
+    optional: true
   facility_name:
     type: String
-    defaultValue: ""
   date_created:
     type: String
     autoValue: ()->
@@ -48,13 +42,10 @@ ClassesSchema = new SimpleSchema
         return moment().toISOString()
   date:
     type: String
-    defaultValue: ""
   start_time:
     type: String
-    defaultValue: ""
   end_time:
     type: String
-    defaultValue: ""
     optional:true
   errors:
     type: [Object]
@@ -64,11 +55,8 @@ ClassesSchema = new SimpleSchema
   "educators.$.contact_salesforce_id":
     type: String
     custom: ->
-      console.log "Custom validation of educators"
       educator = Educators.findOne { contact_salesforce_id: this.value }
-      console.log educator
       if not educator
-        console.log "Not educator!"
         return "notAllowed"
   "educators.$.first_name":
     type: String
@@ -86,7 +74,6 @@ ClassesSchema = new SimpleSchema
     type: String
   "attendees.$.contact_salesforce_id":
     type: String
-    defaultValue: ''
     optional: true
   "attendees.$.patient_attended":
     type: Boolean
@@ -96,7 +83,6 @@ ClassesSchema = new SimpleSchema
   "attendees.$.diagnosis":
     type: String
     optional: true
-    defaultValue: null
   "attendees.$.num_caregivers_attended":
     type: Number
   "attendees.$.phone_1":

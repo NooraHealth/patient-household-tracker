@@ -21,7 +21,6 @@ const TimePicker = React.createClass({
   },
 
   componentDidMount() {
-    console.log("Mounting the calendar");
     $(this.picker).calendar({
       type: "time",
       onChange: this._onChange

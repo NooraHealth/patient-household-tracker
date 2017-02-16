@@ -37,20 +37,19 @@ class NooraClass extends BaseNooraClass
 
   save: ->
     nooraClass = this.toJS()
+    deletedEducators = nooraClass.deleted_educators
+    deletedAttendees = nooraClass.deleted_attendees
     return new Promise ( resolve, reject )->
-      # getClassName = ( doc )->
-      #   suffix = if doc.end_time then " to #{doc.end_time}" else ""
-      #   return "#{ doc.facility_name }: #{ doc.location } - #{ doc.date }, #{doc.start_time}#{suffix}"
-      #
-      # if not nooraClass.date_created? or nooraClass.date_created is ''
-      #   nooraClass.date_created = moment().toISOString()
-      #
-      # # if not nooraClass.name? or nooraClass.name is ''
-      # nooraClass.name = getClassName nooraClass
-      # console.log "About to save this: "
-      # console.log nooraClass
+      try
+        ClassesSchema.clean(nooraClass)
+        ClassesSchema.validate(nooraClass)
+      catch error
+        console.log "ERROR"
+        console.log nooraClass
+        reject( error )
+        return
 
-      Meteor.call "syncWithSalesforce", nooraClass, nooraClass.deleted_attendees, nooraClass.deleted_educators, ( error, results )->
+      Meteor.call "syncWithSalesforce", nooraClass, deletedAttendees, deletedEducators, ( error, results )->
         console.log "Returning from sync w salesforce"
         console.log results
         if error
@@ -59,13 +58,6 @@ class NooraClass extends BaseNooraClass
         else
           console.log "Promise"
           resolve( results )
-          # promise.then((doc)->
-          #   console.log "REsolving promis"
-          #   resolve doc
-          # , (err) ->
-          #   console.log "Error"
-          #   reject(err)
-          # )
 
 if Meteor.isServer
   { SalesforceInterface } = require '../salesforce/SalesforceInterface.coffee'
@@ -73,28 +65,16 @@ if Meteor.isServer
   Meteor.methods
 
     "syncWithSalesforce": ( classDoc, deletedAttendees, deletedEducators )->
-      facility = Facilities.findOne { name: classDoc.facility_name }
-      if not facility
-        throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
-
-      classDoc.facility_salesforce_id = facility.salesforce_id
       classDoc.errors = []
-
       toSalesforce = new SalesforceInterface()
       promise = toSalesforce.upsertClass(classDoc)
       return promise.then( (results)->
         classDoc.attendance_report_salesforce_id = results.id
-        console.log results.errors
         classDoc.errors = results?.errors or []
-        ClassesSchema.clean(classDoc)
-        console.log "ClassDoc!"
-        console.log classDoc
-        return Promise.resolve(ClassesSchema.validate(classDoc))
-      ).then(()->
         id = classDoc.attendance_report_salesforce_id
         return Promise.resolve(Classes.upsert { attendance_report_salesforce_id: id }, { $set: classDoc })
       ).then(()->
-        console.log "Trying second tier"
+        console.log "Upserted the class"
         return toSalesforce.exportClassEducators( classDoc.educators, classDoc.facility_salesforce_id, classDoc.attendance_report_salesforce_id )
       ).then(( results )->
         console.log "Success exporting class educator objects"
