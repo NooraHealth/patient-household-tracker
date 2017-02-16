@@ -43,6 +43,9 @@ var Dropdown = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(this.props.placeholder);
+    console.log("Selected");
+    console.log(this.props.selected);
     if( JSON.stringify(this.props.selected) !== JSON.stringify(prevProps.selected)){
       const values = this._getValues(this.props.selected);
       if( values.length == 0 ){
@@ -87,7 +90,9 @@ var Dropdown = React.createClass({
   },
 
   _getValues( options ){
-    return options.map((selected)=>{ return selected.value });
+    console.log("options");
+    console.log(options);
+    return (options)? options.map((selected)=>{ return selected.value }): [];
   }
 
 });

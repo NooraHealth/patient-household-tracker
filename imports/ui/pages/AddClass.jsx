@@ -47,9 +47,6 @@ var AddClassPage = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    console.log("Component did updated");
-    console.log(this.state.nooraClass.facility_salesforce_id);
-    console.log(this.state.nooraClass.facility_name);
     if( this.props.currentFacilityName !== prevProps.currentFacilityName){
       let nooraClass = this._clearEducators();
       nooraClass = nooraClass.set("condition_operation_salesforce_id", '');
@@ -77,13 +74,14 @@ var AddClassPage = React.createClass({
     });
 
     const operation = ConditionOperations.findOne({ salesforce_id: this.state.nooraClass.condition_operation_salesforce_id });
-    let selectedOption = {
-      name: (operation)? operation.name: "",
-      value: (operation)? operation.salesforce_id: ""
+    let selectedOption = [];
+    if( operation ){
+      selectedOption = [{
+        name: operation.name,
+        value: operation.salesforce_id
+      }];
     }
 
-    console.log("The educators");
-    console.log(this.state.educators);
     let educatorOptions = this.props.availableEducators.map((educator)=> {
         return {
           value: educator.contact_salesforce_id,
@@ -97,8 +95,6 @@ var AddClassPage = React.createClass({
           name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
         }
     });
-    console.log("Selected Educators");
-    console.log(selectedEducators);
 
     let languageOptions = this.props.supportedLanguages.map( function(language){
         return { value: language, name: language };
@@ -110,7 +106,7 @@ var AddClassPage = React.createClass({
           <SelectFacilityContainer/>
           <Form.Dropdown
             options={ operationOptions }
-            selected={ [selectedOption] }
+            selected={ selectedOption }
             label="Condition Operation"
             onChange={ this._handleChange( "condition_operation_salesforce_id") }
           />
@@ -264,7 +260,6 @@ var AddClassPage = React.createClass({
   },
 
   _clearEducators(){
-    console.log("CLEARING EDUCATORS");
     let educators = this.state.nooraClass.educators;
     let deleted = this.state.nooraClass.deleted_educators;
     for (var i = 0; i < educators.size; i++) {
