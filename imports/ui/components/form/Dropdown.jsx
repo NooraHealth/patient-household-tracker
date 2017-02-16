@@ -45,7 +45,11 @@ var Dropdown = React.createClass({
   componentDidUpdate(prevProps, prevState) {
     if( JSON.stringify(this.props.selected) !== JSON.stringify(prevProps.selected)){
       const values = this._getValues(this.props.selected);
-      $(this.dropdown).dropdown("set selected", values);
+      if( values.length == 0 ){
+        $(this.dropdown).dropdown("clear");
+      } else {
+        $(this.dropdown).dropdown("set selected", values);
+      }
     }
   },
 

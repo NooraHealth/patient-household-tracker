@@ -51,13 +51,10 @@ var AddClassPage = React.createClass({
     console.log(this.state.nooraClass.facility_salesforce_id);
     console.log(this.state.nooraClass.facility_name);
     if( this.props.currentFacilityName !== prevProps.currentFacilityName){
-      console.log("UPDATING ALL THE FACILITY STUFF");
       let nooraClass = this._clearEducators();
       nooraClass = nooraClass.set("condition_operation_salesforce_id", '');
       nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName );
       nooraClass = nooraClass.set("facility_salesforce_id", this.props.facilitySalesforceId);
-      console.log("After update");
-      console.log(nooraClass.facility_salesforce_id);
       this.setState({ nooraClass: nooraClass });
     }
   },
@@ -85,6 +82,8 @@ var AddClassPage = React.createClass({
       value: (operation)? operation.salesforce_id: ""
     }
 
+    console.log("The educators");
+    console.log(this.state.educators);
     let educatorOptions = this.props.availableEducators.map((educator)=> {
         return {
           value: educator.contact_salesforce_id,
@@ -98,6 +97,8 @@ var AddClassPage = React.createClass({
           name: educator.first_name + " " + educator.last_name + " ID: " + educator.uniqueId
         }
     });
+    console.log("Selected Educators");
+    console.log(selectedEducators);
 
     let languageOptions = this.props.supportedLanguages.map( function(language){
         return { value: language, name: language };
@@ -257,14 +258,13 @@ var AddClassPage = React.createClass({
     leftOverIds.forEach(function( id ){
       newList = newList.push({ contact_salesforce_id: id });
     });
-    console.log("New list");
-    console.log(newList);
     const nooraClass = this.state.nooraClass.set("deleted_educators", deleted);
     this.setState({ nooraClass: nooraClass });
     this._handleChange("educators")(newList);
   },
 
   _clearEducators(){
+    console.log("CLEARING EDUCATORS");
     let educators = this.state.nooraClass.educators;
     let deleted = this.state.nooraClass.deleted_educators;
     for (var i = 0; i < educators.size; i++) {
