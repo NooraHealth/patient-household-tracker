@@ -292,7 +292,7 @@ var AddClassPage = React.createClass({
           }
           return "<li>" + str + "</li>"
         });
-        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul>";
+        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul> Please go to 'Edit Attendees' and save the class again.";
       }
       that._clearForm();
       showPopup({
