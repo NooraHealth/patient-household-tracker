@@ -258,7 +258,7 @@ var RegisterAttendeesPage = React.createClass({
           }
           return "<li>" + str + "</li>"
         });
-        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul>";
+        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul> Please go to 'Edit Attendees' and save again.";
       }
       that._showPopup({
         type: "success",
