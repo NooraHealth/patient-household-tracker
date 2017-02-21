@@ -47,7 +47,9 @@ var AddClassPage = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    if( this.props.currentFacilityName !== prevProps.currentFacilityName){
+    const changedFacilityName = this.props.currentFacilityName !== prevProps.currentFacilityName;
+    const changedFacilityId = this.props.facilitySalesforceId !== prevProps.facilitySalesforceId;
+    if( changedFacilityId || changedFacilityName ){
       let nooraClass = this._clearEducators();
       nooraClass = nooraClass.set("condition_operation_salesforce_id", '');
       nooraClass = nooraClass.set("facility_name", this.props.currentFacilityName );

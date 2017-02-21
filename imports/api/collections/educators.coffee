@@ -4,7 +4,6 @@
 ###
 
 Educators = new Mongo.Collection Meteor.settings.public.educators_collection
-BackupEducators = new Mongo.Collection "backup_educators"
 
 EducatorsSchema = new SimpleSchema
   _id:
@@ -75,8 +74,6 @@ EducatorsSchema = new SimpleSchema
     defaultValue: false
 
 Educators.attachSchema EducatorsSchema
-BackupEducators.attachSchema EducatorsSchema
 
 module.exports.Educators = Educators
 module.exports.EducatorsSchema = EducatorsSchema
-module.exports.BackupEducators = BackupEducators

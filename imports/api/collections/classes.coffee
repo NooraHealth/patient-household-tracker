@@ -36,8 +36,6 @@ ClassesSchema = new SimpleSchema
   date_created:
     type: String
     autoValue: ()->
-      console.log "Getting the date created"
-      console.log this
       if not this.value
         return moment().toISOString()
   date:
