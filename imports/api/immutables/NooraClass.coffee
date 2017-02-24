@@ -44,19 +44,13 @@ class NooraClass extends BaseNooraClass
         ClassesSchema.clean(nooraClass)
         ClassesSchema.validate(nooraClass)
       catch error
-        console.log "ERROR"
-        console.log nooraClass
         reject( error )
         return
 
       Meteor.call "syncWithSalesforce", nooraClass, deletedAttendees, deletedEducators, ( error, results )->
-        console.log "Returning from sync w salesforce"
-        console.log results
         if error
-          console.log "Error??"
           reject error
         else
-          console.log "Promise"
           resolve( results )
 
 if Meteor.isServer
@@ -67,8 +61,11 @@ if Meteor.isServer
     "syncWithSalesforce": ( classDoc, deletedAttendees, deletedEducators )->
       classDoc.errors = []
       toSalesforce = new SalesforceInterface()
-      promise = toSalesforce.upsertClass(classDoc)
-      return promise.then( (results)->
+      promise = Promise.resolve(Meteor.call "assignPatientIds", classDoc)
+      return promise.then( (newClassDoc) ->
+        classDoc = newClassDoc
+        return toSalesforce.upsertClass(classDoc)
+      ).then( (results)->
         classDoc.attendance_report_salesforce_id = results.id
         classDoc.errors = results?.errors or []
         id = classDoc.attendance_report_salesforce_id
@@ -96,8 +93,6 @@ if Meteor.isServer
         return toSalesforce.upsertAttendees(classDoc, classDoc.attendees)
       ).then( (results)->
         console.log "Successfully upserted Attendees"
-        console.log "results.attendees"
-        console.log results.attendees
         classDoc.attendees = results.attendees
         id = classDoc.attendance_report_salesforce_id
         if results.errors
@@ -129,5 +124,34 @@ if Meteor.isServer
       ClassesSchema.validate(nooraClass);
       reportId = nooraClass.attendance_report_salesforce_id
       return Classes.upsert { attendance_report_salesforce_id: reportId }, { $set: nooraClass }
+
+    "assignPatientIds": ( classDoc )->
+      getUniqueId = ( classDoc )->
+
+        getInitials = ( name, location )->
+          words = name.split " "
+          letters = words.map (word)->
+            cleaned = word.replace(/[^a-zA-Z]/g, "")
+            return cleaned[0]?.toUpperCase()
+          letters.push(location[0]?.toUpperCase())
+          return letters.join("")
+
+        initials = getInitials( classDoc.facility_name, classDoc.location )
+        result = UniqueID.findOne({ name: initials })
+        id = 0
+        if not result
+          UniqueID.insert { name: initials, currentUniqueID: id }
+        else
+          id = result.currentUniqueID
+
+        UniqueID.update { name: initials }, { $inc:{ currentUniqueID: 1 }}
+        return initials + moment(classDoc.date).format("YYMMDD") + id
+
+      for attendee in classDoc.attendees
+        if not attendee.patient_id or attendee.patient_id == ''
+          attendee.patient_id = getUniqueId classDoc
+        console.log attendee.patient_id
+      return classDoc
+
 
 module.exports.NooraClass = NooraClass

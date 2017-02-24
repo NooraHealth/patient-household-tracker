@@ -70,6 +70,9 @@ ClassesSchema = new SimpleSchema
     optional: true
   "attendees.$.name":
     type: String
+  "attendees.$.patient_id":
+    type: String
+    optional: true
   "attendees.$.contact_salesforce_id":
     type: String
     optional: true

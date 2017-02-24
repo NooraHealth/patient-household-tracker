@@ -258,15 +258,18 @@ var RegisterAttendeesPage = React.createClass({
           }
           return "<li>" + str + "</li>"
         });
-        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul> Please go to 'Edit Attendees' and save again.";
+        text = "There were errors syncing with Salesforce:<ul>" + errors +" </ul> Please save again.";
+        that.setState({ loading: false });
+      } else {
+        FlowRouter.go("home");
       }
+
       that._showPopup({
         type: "success",
         title: "Attendees Saved Successfully",
         text: text,
         html: true
       });
-      FlowRouter.go("home");
     };
 
     const onSaveError = function(error) {
@@ -279,6 +282,12 @@ var RegisterAttendeesPage = React.createClass({
       });
     }
     this.state.nooraClass.save().then( results => onSaveSuccess(results), error => onSaveError(error))
+    if( this.state.nooraClass.attendees.size > 10 ){
+      that._showPopup({
+        type: "warning",
+        title: "Looks like you're registering a lot of attendees. This may take a while. If there are errors, please save the class again."
+      });
+    }
   }
 
 });

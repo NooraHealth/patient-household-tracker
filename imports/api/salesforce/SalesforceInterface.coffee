@@ -36,6 +36,7 @@ class SalesforceInterface
         if err
           console.log "ERror exporting class educators!!"
           console.log err
+          console.log educator
           errors.push { "Error exporting class educator": err.name }
         else
           educator.export_error = null
@@ -56,7 +57,6 @@ class SalesforceInterface
 
   upsertAttendees: ( classDoc, attendees )->
     return new Promise (resolve, reject)->
-      console.log "Upserting attendees"
       if attendees.length is 0
         resolve { result: [], errors: [] }
         return
@@ -71,6 +71,7 @@ class SalesforceInterface
           "MobilePhone" : attendee.phone_1 or 0,
           "HomePhone" : attendee.phone_2 or 0,
           "Patient_Attended_Class__c" : attendee.patient_attended,
+          "Patient_Id__c" : attendee.patient_id,
           "Languages__c" : attendee.language,
           "Diagnosis__c" : attendee.diagnosis,
           "Number_Family_Members_Attended_Class__c" : attendee.num_caregivers_attended,
@@ -89,28 +90,20 @@ class SalesforceInterface
         else
           "Successfully exported"
           attendee.export_error = null
-          attendee.contact_salesforce_id = ret.id
+          if ret.id
+            attendee.contact_salesforce_id = ret.id
         updatedAttendees.push attendee
-        console.log "updated attendees"
-        console.log updatedAttendees
         if updatedAttendees.length == attendees.length
           resolve( { attendees: updatedAttendees, errors: errors } )
 
       i = 0
       upsertNextAttendee = ->
-        contact = contacts[i]
-        attendee = attendees[i]
-        recordId = attendee.contact_salesforce_id
-        if recordId? and recordId != ''
-          contact.Id = recordId
-          Salesforce.sobject("Contact").update contact, "Id", callback.bind(this, attendee )
-        else
-          Salesforce.sobject("Contact").insert contact, callback.bind(this, attendee )
+        Salesforce.sobject("Contact").upsert contacts[i], "Patient_Id__c", callback.bind(this, attendees[i] )
         i = ++i
         if i is contacts.length
           Meteor.clearInterval(this.handle)
 
-      this.handle = Meteor.setInterval(upsertNextAttendee.bind(this), 300)
+      this.handle = Meteor.setInterval(upsertNextAttendee.bind(this), 500)
 
 
   deleteRecords: (ids, objectName )->
