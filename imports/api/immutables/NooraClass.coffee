@@ -92,7 +92,7 @@ if Meteor.isServer
         id = classDoc.attendance_report_salesforce_id
         if results.errors
           classDoc.errors = classDoc.errors.concat results.errors
-        Classes.update { attendance_report_salesforce_id: id }, { $set: classDoc }
+        Classes.update { name: classDoc.name }, { $set: classDoc }
         filtered = deletedEducators.filter (educator)->
           id = educator.class_educator_salesforce_id
           return id? and id != ''
