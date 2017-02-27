@@ -21,7 +21,7 @@ export default AddClassContainer = createContainer(( params ) => {
   };
 
   this._getClass = function( reportId ) {
-    let nooraClass = Classes.findOne({ attendance_report_salesforce_id: reportId });
+    let nooraClass = Classes.findOne({ _id: reportId });
     if( !nooraClass ) return nooraClass;
     nooraClass.educators = nooraClass.educators.map((educator) => {
       const doc = Educators.findOne({ contact_salesforce_id: educator.contact_salesforce_id });

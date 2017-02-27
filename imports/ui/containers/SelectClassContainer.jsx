@@ -9,7 +9,6 @@ export default SelectClassContainer = createContainer(( params ) => {
   var classes_handle = Meteor.subscribe("classes.all");
   var educators_handle = Meteor.subscribe("educators.all");
 
-  console.log(params);
   this._getClasses = function( facilityName ){
     if( params.mode == "editClass" ){
       return Classes.find({ facility_name: facilityName }).fetch().reverse();

@@ -7,6 +7,7 @@ moment = require 'moment'
 { ClassesSchema } = require '../collections/classes.coffee'
 
 BaseNooraClass = Immutable.Record {
+  _id: null,
   location: '',
   name: '',
   date: moment().format("YYYY-MM-DD"),
@@ -36,7 +37,10 @@ class NooraClass extends BaseNooraClass
     });
 
   save: ->
+    docId = this._id
     nooraClass = this.toJS()
+    console.log "This to JS"
+    console.log nooraClass
     deletedEducators = nooraClass.deleted_educators
     deletedAttendees = nooraClass.deleted_attendees
     return new Promise ( resolve, reject )->
@@ -47,6 +51,8 @@ class NooraClass extends BaseNooraClass
         reject( error )
         return
 
+      #after clean/validation, return the _id to the document
+      nooraClass._id = docId
       Meteor.call "syncWithSalesforce", nooraClass, deletedAttendees, deletedEducators, ( error, results )->
         if error
           reject error
@@ -64,14 +70,21 @@ if Meteor.isServer
       promise = Promise.resolve(Meteor.call "assignPatientIds", classDoc)
       return promise.then( (newClassDoc) ->
         classDoc = newClassDoc
+        console.log "ClassDoc"
+        console.log newClassDoc
         return toSalesforce.upsertClass(classDoc)
       ).then( (results)->
         classDoc.attendance_report_salesforce_id = results.id
         classDoc.errors = results?.errors or []
-        id = classDoc.attendance_report_salesforce_id
-        return Promise.resolve(Classes.upsert { attendance_report_salesforce_id: id }, { $set: classDoc })
-      ).then(()->
+        console.log "Class Doc id: #{classDoc._id}"
+        if not classDoc._id
+          console.log "Inserting a new document"
+          return Promise.resolve(Classes.insert classDoc)
+        else
+          return Promise.resolve(Classes.update { _id: classDoc._id }, { $set: classDoc })
+      ).then(( results )->
         console.log "Upserted the class"
+        console.log results
         return toSalesforce.exportClassEducators( classDoc.educators, classDoc.facility_salesforce_id, classDoc.attendance_report_salesforce_id )
       ).then(( results )->
         console.log "Success exporting class educator objects"

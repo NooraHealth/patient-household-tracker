@@ -36,7 +36,7 @@ var SelectClassPage = React.createClass({
   render() {
     const submitText = "SELECT CLASS"
     const classOptions = this.props.classes.map(function(nooraClass) {
-      return { value: nooraClass.attendance_report_salesforce_id, name: nooraClass.name };
+      return { value: nooraClass._id, name: nooraClass.name };
     });
 
     return (

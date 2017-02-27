@@ -10,7 +10,7 @@ export default RegisterAttendeesContainer = createContainer(( params ) => {
   var classes_handle = Meteor.subscribe("classes.all");
   var educators_handle = Meteor.subscribe("educators.all");
 
-  var classDoc = Classes.findOne({ attendance_report_salesforce_id: params.reportId });
+  var classDoc = Classes.findOne({ _id: params.reportId });
 
   this._getDiagnosisOptions = function( classes ) {
     let previousDiagnoses = AppConfig.getBaseDiagnoses();
