@@ -26,6 +26,7 @@ export default SelectFacilityContainer = createContainer(() => {
     loading: ! handle.ready(),
     options: _getFacilityOptions( Facilities.find({}).fetch() ),
     label: "Facility",
+    required: true,
     selected: [{ value: AppConfig.getFacilityName(), name: AppConfig.getFacilityName()}],
     placeholder: " Search Facilities",
     onChange: _onChange

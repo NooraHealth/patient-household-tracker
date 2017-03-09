@@ -6,6 +6,7 @@ var Checkbox = React.createClass({
   propTypes: {
     label: React.PropTypes.string,
     onChange: React.PropTypes.func,
+    required: React.PropTypes.bool,
     checked: React.PropTypes.bool
   },
 
@@ -35,9 +36,9 @@ var Checkbox = React.createClass({
   },
 
   render(){
-    var { label, onChange, ...inputProps } = this.props;
+    var { label, onChange, required, ...inputProps } = this.props;
     return (
-      <div className="inline field">
+      <div className={ (required)? "required inline field": "inline field" }>
         <label>{ label }</label>
         <div className="ui checkbox" ref={ (checkbox)=> this.checkbox = checkbox }>
           <input type="checkbox" name="activation"/>

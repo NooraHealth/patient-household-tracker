@@ -7,6 +7,7 @@ var Input = React.createClass({
 
   propTypes: {
     icon: React.PropTypes.string,
+    required: React.PropTypes.bool,
     onChange: React.PropTypes.func
   },
 
@@ -25,8 +26,8 @@ var Input = React.createClass({
   },
 
   render(){
-    var { title, icon, value, inputClasses, onChange, ...inputProps } = this.props;
-    let classes = "field";
+    var { title, icon, value, required, inputClasses, onChange, ...inputProps } = this.props;
+    let classes = (required)? "required field" : "field";
     if( inputClasses !== undefined ){
       classes = inputClasses + " " + classes;
     }

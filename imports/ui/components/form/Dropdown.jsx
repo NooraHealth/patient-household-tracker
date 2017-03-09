@@ -5,6 +5,7 @@ var Dropdown = React.createClass({
 
   propTypes: {
     placeholder: React.PropTypes.string,
+    required: React.PropTypes.bool,
     options: React.PropTypes.arrayOf(( options, index )=> {
       return new SimpleSchema({
         value: { type:String },
@@ -43,9 +44,6 @@ var Dropdown = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(this.props.placeholder);
-    console.log("Selected");
-    console.log(this.props.selected);
     if( JSON.stringify(this.props.selected) !== JSON.stringify(prevProps.selected)){
       const values = this._getValues(this.props.selected);
       if( values.length == 0 ){
@@ -57,7 +55,7 @@ var Dropdown = React.createClass({
   },
 
   render(){
-    const { options, multiple, label, selected, placeholder, style } = this.props;
+    const { options, multiple, required, label, selected, placeholder, style } = this.props;
     const optionElems = options.map(function(option, i){
       const key = "option-" + option.value;
       return <option value={option.value} key={key}>{option.name}</option>
@@ -69,12 +67,11 @@ var Dropdown = React.createClass({
       } else {
         return "ui fluid search normal selection dropdown";
       }
-
     }
     return (
       <div
         style={ style }
-        className="field"
+        className={ (required)? "required field": "field" }
         >
         <label>{ label }</label>
         <select

@@ -79,12 +79,15 @@ var RegisterAttendeesPage = React.createClass({
         <Form.Input
           key= { 'name--' + i }
           placeholder= "Name"
+          label= "Name"
+          required={ true }
           inputClasses="four wide"
           value={ name }
           onChange={ this._handleChange(i, "name") }
         />
         <Form.Input
           type='tel'
+          label="Phone One"
           key= { 'phone1--' + i }
           placeholder="Phone One"
           inputClasses="four wide"
@@ -93,6 +96,7 @@ var RegisterAttendeesPage = React.createClass({
         />
         <Form.Input
           type='tel'
+          label="Phone Two"
           key= { 'phone2--' + i }
           placeholder="Phone Two"
           value={ phone2 }
@@ -108,8 +112,10 @@ var RegisterAttendeesPage = React.createClass({
         <Form.Input
           type='number'
           key= { 'num-caregivers--' + i }
+          required={ true }
           inputClasses="four wide"
           placeholder="# Caregivers Attended"
+          label="Caregivers"
           value={ numCaregivers }
           onChange={ this._handleChange(i, "num_caregivers_attended") }
         />

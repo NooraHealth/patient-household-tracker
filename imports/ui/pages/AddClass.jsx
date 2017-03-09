@@ -110,12 +110,14 @@ var AddClassPage = React.createClass({
             options={ operationOptions }
             selected={ selectedOption }
             label="Condition Operation"
+            required= { true }
             onChange={ this._handleChange( "condition_operation_salesforce_id") }
           />
           <Form.Search
             key= 'class_location'
             label="Location"
             value={ this.state.nooraClass.location }
+            required= { true }
             onChange={ this._handleChange("location") }
             source={ source }
           />
@@ -125,6 +127,7 @@ var AddClassPage = React.createClass({
               key= 'total_patients'
               label= 'Total Patients'
               type= 'number'
+              required= { true }
               placeholder="Total Patients"
               value={ this.state.nooraClass.total_patients }
               onChange={ this._handleChange("total_patients") }
@@ -134,6 +137,7 @@ var AddClassPage = React.createClass({
               key= 'total_family_members'
               label= 'Total Family Members'
               type= 'number'
+              required= { true }
               placeholder="Total Family Members"
               value={ this.state.nooraClass.total_family_members }
               onChange={ this._handleChange("total_family_members") }
@@ -151,7 +155,7 @@ var AddClassPage = React.createClass({
           </div>
 
           <div className="fields">
-            <div className="field">
+            <div className="required field">
               <label> Date of Class </label>
               <DatePicker
                 className="right floated"

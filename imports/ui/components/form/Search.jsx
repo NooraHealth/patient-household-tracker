@@ -9,6 +9,7 @@ var Search = React.createClass({
     value: React.PropTypes.string,
     label: React.PropTypes.string,
     icon: React.PropTypes.string,
+    required: React.PropTypes.bool,
     onChange: React.PropTypes.func,
     source: React.PropTypes.array
   },
@@ -80,7 +81,7 @@ var Search = React.createClass({
   },
 
   render(){
-    var { label, icon, value, onChange, source, loading, ...inputProps } = this.props;
+    var { label, icon, value, onChange, required, source, loading, ...inputProps } = this.props;
     const getInputClasses = function() {
       const defaultClasses = "ui fluid";
       const type = (icon)? "left icon": "";
@@ -97,7 +98,7 @@ var Search = React.createClass({
       }
     }
     return (
-      <div className="field">
+      <div className={ (required)? "required field" : "field" }>
         { getInputPrefix() }
         <div
           className="ui search"
