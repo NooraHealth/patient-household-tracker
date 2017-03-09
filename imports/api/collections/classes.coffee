@@ -8,16 +8,18 @@ ClassesSchema = new SimpleSchema
     type: String
     autoValue: ()->
       endTime = if this.field("end_time").isSet then this.field("end_time").value else null
-      startTime = this.field("start_time").value
+      startTime = if this.field("start_time").isSet then this.field("start_time").value else null
       facilityName = this.field("facility_name").value
       location = this.field("location").value
       date = this.field("date").value
+      prefix = if startTime then ", #{ startTime }" else ""
       suffix = if endTime then " to #{ endTime }" else ""
-      return "#{ facilityName }: #{ location } - #{ date }, #{ startTime }#{ suffix }"
+      return "#{ facilityName }: #{ location } - #{ date }#{ prefix }#{ suffix }"
   location:
     type: String
   majority_language:
     type: String
+    optional: true
   total_patients:
     type: Number
   total_family_members:
@@ -42,6 +44,7 @@ ClassesSchema = new SimpleSchema
     type: String
   start_time:
     type: String
+    optional: true
   end_time:
     type: String
     optional:true
@@ -81,6 +84,7 @@ ClassesSchema = new SimpleSchema
     optional: true
   "attendees.$.language":
     type: String
+    optional: true
   "attendees.$.diagnosis":
     type: String
     optional: true

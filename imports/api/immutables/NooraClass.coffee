@@ -47,6 +47,10 @@ class NooraClass extends BaseNooraClass
       try
         ClassesSchema.clean(nooraClass)
         ClassesSchema.validate(nooraClass)
+        classAlreadyExists = Classes.findOne({name: nooraClass.name})?
+        if classAlreadyExists
+          reject { message: "Class #{ nooraClass.name } already exists. Please edit class from the home page." }
+          return
       catch error
         reject( error )
         return
@@ -67,7 +71,7 @@ if Meteor.isServer
     "syncWithSalesforce": ( classDoc, deletedAttendees, deletedEducators )->
       classDoc.errors = []
       toSalesforce = new SalesforceInterface()
-      promise = Promise.resolve(Meteor.call "assignPatientIds", classDoc)
+      promise = Promise.resolve( Meteor.call "assignPatientIds", classDoc)
       return promise.then( (newClassDoc) ->
         classDoc = newClassDoc
         console.log "ClassDoc"

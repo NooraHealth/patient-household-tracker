@@ -7,8 +7,8 @@
     "dev": "meteor run --settings settings_dev.json",
     "dev-ios": "meteor run ios-device --settings settings_dev.json",
     "prod-ios": "meteor run ios-device --settings settings.json",
-    "build-ios": "meteor run ios-device --mobile-server http://educatorregistry.noorahealth.org",
-    "build": "meteor build ../educator-id-generator-build --server=http://educatorregistry.noorahealth.org"
+    "build-ios": "meteor run ios-device --mobile-server http://patienttracker.noorahealth.org",
+    "build": "meteor build ../patient-household-tracker-build --server=http://patienttracker.noorahealth.org"
   },
   "dependencies": {
     "asap": "^2.0.5",
