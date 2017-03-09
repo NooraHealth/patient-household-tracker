@@ -47,17 +47,22 @@ class NooraClass extends BaseNooraClass
       try
         ClassesSchema.clean(nooraClass)
         ClassesSchema.validate(nooraClass)
-        classAlreadyExists = Classes.findOne({name: nooraClass.name})?
-        if classAlreadyExists
+        if Classes.findOne({ name: nooraClass.name})? and not docId?
+          console.log "Class Already Existss!!!"
           reject { message: "Class #{ nooraClass.name } already exists. Please edit class from the home page." }
           return
       catch error
+        console.log "There was an error"
+        console.log error
         reject( error )
         return
 
       #after clean/validation, return the _id to the document
       nooraClass._id = docId
       Meteor.call "syncWithSalesforce", nooraClass, deletedAttendees, deletedEducators, ( error, results )->
+        console.log "Classing sync with salesforce returning"
+        console.log error
+        console.log results
         if error
           reject error
         else
@@ -167,7 +172,6 @@ if Meteor.isServer
       for attendee in classDoc.attendees
         if not attendee.patient_id or attendee.patient_id == ''
           attendee.patient_id = getUniqueId classDoc
-        console.log attendee.patient_id
       return classDoc
 
 
