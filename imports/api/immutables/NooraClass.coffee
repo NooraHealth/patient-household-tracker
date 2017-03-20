@@ -73,8 +73,6 @@ if Meteor.isServer
       promise = Promise.resolve( Meteor.call "assignPatientIds", classDoc)
       return promise.then( (newClassDoc) ->
         classDoc = newClassDoc
-        console.log "ClassDoc"
-        console.log newClassDoc
         return toSalesforce.upsertClass(classDoc)
       ).then( (results)->
         classDoc.attendance_report_salesforce_id = results.id

@@ -87,8 +87,6 @@ var Dropdown = React.createClass({
   },
 
   _getValues( options ){
-    console.log("options");
-    console.log(options);
     return (options)? options.map((selected)=>{ return selected.value }): [];
   }
 
