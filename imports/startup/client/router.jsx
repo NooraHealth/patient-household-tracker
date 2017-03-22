@@ -10,7 +10,7 @@ import { SelectFacilityContainer } from '../../ui/containers/SelectFacilityConta
 import { AddClassContainer } from '../../ui/containers/AddClassContainer.jsx';
 import { SelectClassContainer } from '../../ui/containers/SelectClassContainer.jsx';
 import { RegisterAttendeesContainer } from '../../ui/containers/RegisterAttendeesContainer.jsx';
-import { BackButton } from '../../ui/components/Headers/BackButton.jsx';
+import { BackButton } from '../../ui/components/header/BackButton.jsx';
 
 FlowRouter.route('/', {
   name: "home",

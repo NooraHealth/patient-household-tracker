@@ -1,11 +1,11 @@
 'use strict';
 
 import React from 'react';
-import { Input } from '../Input.jsx';
-import { Search } from '../Search.jsx';
-import { Checkbox } from '../Checkbox.jsx';
-import { Dropdown } from '../Dropdown.jsx';
-import { TimePicker } from '../TimePicker.jsx';
+import { Input } from './Input.jsx';
+import { Search } from './Search.jsx';
+import { Checkbox } from './Checkbox.jsx';
+import { Dropdown } from './Dropdown.jsx';
+import { TimePicker } from './TimePicker.jsx';
 
 var Form = React.createClass({
   propTypes: {

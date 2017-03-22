@@ -39,8 +39,6 @@ class NooraClass extends BaseNooraClass
   save: ->
     docId = this._id
     nooraClass = this.toJS()
-    console.log "This to JS"
-    console.log nooraClass
     deletedEducators = nooraClass.deleted_educators
     deletedAttendees = nooraClass.deleted_attendees
     return new Promise ( resolve, reject )->
@@ -63,81 +61,70 @@ class NooraClass extends BaseNooraClass
           resolve( results )
 
 if Meteor.isServer
+
   { SalesforceInterface } = require '../salesforce/SalesforceInterface.coffee'
 
   Meteor.methods
-
     "syncWithSalesforce": ( classDoc, deletedAttendees, deletedEducators )->
-      classDoc.errors = []
       toSalesforce = new SalesforceInterface()
       promise = Promise.resolve( Meteor.call "assignPatientIds", classDoc)
-      return promise.then( (newClassDoc) ->
-        classDoc = newClassDoc
+      return promise.then( (classDoc) ->
+        #Upsert the class in Salesforce
         return toSalesforce.upsertClass(classDoc)
       ).then( (results)->
+        #Upsert the class in MongoDB
         classDoc.attendance_report_salesforce_id = results.id
         classDoc.errors = results?.errors or []
-        console.log "Class Doc id: #{classDoc._id}"
-        if not classDoc._id
-          console.log "Inserting a new document"
-          return Promise.resolve(Classes.insert classDoc)
-        else
-          return Promise.resolve(Classes.update { _id: classDoc._id }, { $set: classDoc })
+        return Promise.resolve( Classes.upsert { attendance_report_salesforce_id: results._id }, { $set: classDoc })
+        # if not classDoc._id
+        #   return Promise.resolve( Classes.insert classDoc )
+        # else
       ).then(( results )->
-        console.log "Upserted the class"
-        console.log results
+        #export class educators to Salesforce
         return toSalesforce.exportClassEducators( classDoc.educators, classDoc.facility_salesforce_id, classDoc.attendance_report_salesforce_id )
       ).then(( results )->
-        console.log "Success exporting class educator objects"
+        #delete necessary educator records
         classDoc.educators = results.educators
-        id = classDoc.attendance_report_salesforce_id
         if results.errors
           classDoc.errors = classDoc.errors.concat results.errors
-        Classes.update { name: classDoc.name }, { $set: classDoc }
-        filtered = deletedEducators.filter (educator)->
-          id = educator.class_educator_salesforce_id
-          return id? and id != ''
-        toDelete = filtered.map (educator) -> return educator.class_educator_salesforce_id
-        newPromise =  toSalesforce.deleteRecords(toDelete, "Class_Educator__c")
-        return newPromise
+        id = classDoc.attendance_report_salesforce_id
+        Classes.update { attendance_report_salesforce_id: id }, { $set: classDoc }
+
+        toDelete = deletedEducators
+          .filter((educator)->
+            id = educator.class_educator_salesforce_id
+            return id? and id != ''
+          ).map (educator) ->
+            return educator.class_educator_salesforce_id
+        return toSalesforce.deleteRecords(toDelete, "Class_Educator__c")
       ).then(( deleteResults )->
-        console.log "Success deleting class educator objects"
+        #upsert attendee records in Salesforce
         if deleteResults.errors
           classDoc.errors = classDoc.errors.concat deleteResults.errors
         return toSalesforce.upsertAttendees(classDoc, classDoc.attendees)
       ).then( (results)->
-        console.log "Successfully upserted Attendees"
+        #delete necessary attendee records
         classDoc.attendees = results.attendees
-        id = classDoc.attendance_report_salesforce_id
         if results.errors
           classDoc.errors = classDoc.errors.concat results.errors
+        id = classDoc.attendance_report_salesforce_id
         Classes.update { attendance_report_salesforce_id: id }, { $set: classDoc }
-        filtered = deletedAttendees.filter (attendee)->
-          id = attendee.contact_salesforce_id
-          return id? and id != ''
-        toDelete = filtered.map (attendee) -> return attendee.contact_salesforce_id
+
+        toDelete = deletedAttendees
+          .filter((attendee)->
+            id = attendee.contact_salesforce_id
+            return id? and id != ''
+          ).map (attendee) ->
+            return attendee.contact_salesforce_id
         return toSalesforce.deleteRecords(toDelete, "Contact")
       ).then( (results)->
-        console.log "Successfully deleted attendees"
+        #return results and errors to the client
         if results.errors
           classDoc.errors = classDoc.errors.concat results.errors
         return { doc: classDoc, syncErrors: classDoc.errors }
       , (err)->
-        console.log err
         throw err
       )
-
-    "nooraClass.upsert": ( nooraClass )->
-
-      facility = Facilities.findOne { name: nooraClass.facility_name }
-      if not facility
-        throw new Meteor.Error "Facility Does Not Exist", "That facility is not in the database. Ensure that the facility exists in Salesforce and has been synced with the app"
-
-      nooraClass.facility_salesforce_id = facility.salesforce_id
-      ClassesSchema.clean(nooraClass)
-      ClassesSchema.validate(nooraClass);
-      reportId = nooraClass.attendance_report_salesforce_id
-      return Classes.upsert { attendance_report_salesforce_id: reportId }, { $set: nooraClass }
 
     "assignPatientIds": ( classDoc )->
       getUniqueId = ( classDoc )->
@@ -164,6 +151,7 @@ if Meteor.isServer
       for attendee in classDoc.attendees
         if not attendee.patient_id or attendee.patient_id == ''
           attendee.patient_id = getUniqueId classDoc
+
       return classDoc
 
 

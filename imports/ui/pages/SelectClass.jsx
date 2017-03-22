@@ -2,7 +2,7 @@
 'use strict';
 
 import React from 'react';
-import { Form } from '../components/form/base/Form.jsx';
+import { Form } from '../components/form/Form.jsx';
 import { Classes } from '../../api/collections/classes.coffee';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
 import { SelectFacilityContainer } from '../containers/SelectFacilityContainer.jsx';

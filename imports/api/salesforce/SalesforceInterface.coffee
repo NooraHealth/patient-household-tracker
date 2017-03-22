@@ -7,7 +7,6 @@ class SalesforceInterface
 
   constructor: ->
     login = Salesforce.login Meteor.settings.SF_USER, Meteor.settings.SF_PASS, Meteor.settings.SF_TOKEN
-    console.log login
 
   exportClassEducators: ( educators, facilityId, attendanceReportId )->
     return new Promise (resolve, reject)->
@@ -34,9 +33,6 @@ class SalesforceInterface
       errors = []
       callback = Meteor.bindEnvironment ( educator, err, ret ) ->
         if err
-          console.log "ERror exporting class educators!!"
-          console.log err
-          console.log educator
           errors.push { "Error exporting class educator": err.name }
         else
           educator.export_error = null
@@ -84,11 +80,8 @@ class SalesforceInterface
       errors = []
       callback = Meteor.bindEnvironment ( attendee, err, ret ) ->
         if err
-          console.log "Error exporting class attendees"
-          console.log err
           errors.push { "Error exporting class attendee": err.name }
         else
-          "Successfully exported"
           attendee.export_error = null
           if ret.id
             attendee.contact_salesforce_id = ret.id
@@ -145,12 +138,8 @@ class SalesforceInterface
 
       callback = Meteor.bindEnvironment ( err, ret ) ->
         if err
-          console.log "Error exporting class"
-          console.log err
           resolve({ errors: [{ "Error exporting/updating class": err.name }]})
         else
-          console.log "ret"
-          console.log ret.id
           resolve({ id: ret.id })
 
       #insert into the Salesforce database
@@ -159,7 +148,6 @@ class SalesforceInterface
         salesforceObj.Id = id
         Salesforce.sobject("Attendance_Report__c").update salesforceObj, "Id", callback
       else
-        console.log "exporting class"
         Salesforce.sobject("Attendance_Report__c").insert salesforceObj, callback
 
 module.exports.SalesforceInterface = SalesforceInterface

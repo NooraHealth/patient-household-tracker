@@ -44,6 +44,7 @@ var Dropdown = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
+    /* TODO: this is not the best way to compare arrays. Revise */
     if( JSON.stringify(this.props.selected) !== JSON.stringify(prevProps.selected)){
       const values = this._getValues(this.props.selected);
       if( values.length == 0 ){
@@ -58,11 +59,11 @@ var Dropdown = React.createClass({
     const { options, multiple, required, label, selected, placeholder, style } = this.props;
     const optionElems = options.map(function(option, i){
       const key = "option-" + option.value;
-      return <option value={option.value} key={key}>{option.name}</option>
+      return <option value={ option.value } key={ key }>{ option.name }</option>
     });
 
     const getClasses = ()=> {
-      if (multiple) {
+      if( multiple ) {
         return "ui fluid multiple search normal selection dropdown";
       } else {
         return "ui fluid search normal selection dropdown";

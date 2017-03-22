@@ -3,7 +3,7 @@
 import React from 'react';
 import moment from 'moment';
 import Immutable from 'immutable'
-import { Form } from '../components/form/base/Form.jsx';
+import { Form } from '../components/form/Form.jsx';
 import { Educators } from '../../api/collections/educators.coffee';
 import { ConditionOperations } from '../../api/collections/condition_operations.coffee';
 import { Facilities } from '../../api/collections/facilities.coffee';

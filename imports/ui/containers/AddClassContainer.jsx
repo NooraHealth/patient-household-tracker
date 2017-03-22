@@ -12,15 +12,15 @@ export default AddClassContainer = createContainer(( params ) => {
   var classes_handle = Meteor.subscribe("classes.all");
   var condition_ops_handle = Meteor.subscribe("condition_operations.all");
 
-  this._getAvailableEducators = function( facilityName ){
+  _getAvailableEducators = function( facilityName ){
     return Educators.find({ facility_name: facilityName }).fetch();
   };
 
-  this._getConditionOperations = function( facilityName ) {
+  _getConditionOperations = function( facilityName ) {
     return ConditionOperations.find({ facility_name: facilityName }).fetch();
   };
 
-  this._getClass = function( reportId ) {
+  _getClass = function( reportId ) {
     let nooraClass = Classes.findOne({ _id: reportId });
     if( !nooraClass ) return nooraClass;
     nooraClass.educators = nooraClass.educators.map((educator) => {
@@ -35,7 +35,7 @@ export default AddClassContainer = createContainer(( params ) => {
     return nooraClass;
   };
 
-  this._getClassLocations = function( classes ) {
+  _getClassLocations = function( classes ) {
     const locations = classes.map( function( nooraClass ) {
       return nooraClass.location;
     });

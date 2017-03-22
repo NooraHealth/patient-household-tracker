@@ -3,7 +3,7 @@
 
 import React from 'react';
 import Immutable from 'immutable'
-import { Form } from '../components/form/base/Form.jsx';
+import { Form } from '../components/form/Form.jsx';
 import { Educators } from '../../api/collections/educators.coffee';
 import { Classes } from '../../api/collections/classes.coffee';
 import { NooraClass } from '../../api/immutables/NooraClass.coffee';
