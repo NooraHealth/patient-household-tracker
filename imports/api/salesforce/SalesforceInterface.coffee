@@ -7,6 +7,7 @@ class SalesforceInterface
 
   constructor: ->
     login = Salesforce.login Meteor.settings.SF_USER, Meteor.settings.SF_PASS, Meteor.settings.SF_TOKEN
+    console.log login
 
   exportClassEducators: ( educators, facilityId, attendanceReportId )->
     return new Promise (resolve, reject)->
@@ -80,6 +81,8 @@ class SalesforceInterface
       errors = []
       callback = Meteor.bindEnvironment ( attendee, err, ret ) ->
         if err
+          console.log "ERROR"
+          console.log err
           errors.push { "Error exporting class attendee": err.name }
         else
           attendee.export_error = null

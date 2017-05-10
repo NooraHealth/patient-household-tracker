@@ -17,6 +17,9 @@ export default AddClassContainer = createContainer(( params ) => {
   };
 
   _getConditionOperations = function( facilityName ) {
+    console.log("facilityName");
+    console.log(facilityName);
+    console.log(ConditionOperations.find({ facility_name: facilityName }).fetch());
     return ConditionOperations.find({ facility_name: facilityName }).fetch();
   };
 

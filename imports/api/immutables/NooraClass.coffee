@@ -66,26 +66,38 @@ if Meteor.isServer
 
   Meteor.methods
     "syncWithSalesforce": ( classDoc, deletedAttendees, deletedEducators )->
+      console.log "About to sync class "
+      console.log classDoc
       toSalesforce = new SalesforceInterface()
       promise = Promise.resolve( Meteor.call "assignPatientIds", classDoc)
-      return promise.then( (classDoc) ->
+      return promise.then( (updatedClassDoc) ->
         #Upsert the class in Salesforce
+        classDoc = updatedClassDoc
+        console.log "Upserting class to salesforce"
         return toSalesforce.upsertClass(classDoc)
       ).then( (results)->
         #Upsert the class in MongoDB
+        console.log "Upserting to mongodb"
         classDoc.attendance_report_salesforce_id = results.id
         classDoc.errors = results?.errors or []
-        return Promise.resolve( Classes.upsert { attendance_report_salesforce_id: results._id }, { $set: classDoc })
+        if( classDoc._id )
+          return Promise.resolve( Classes.update { _id: classDoc._id }, { $set: classDoc })
+        else
+          return Promise.resolve( Classes.insert classDoc )
         # if not classDoc._id
         #   return Promise.resolve( Classes.insert classDoc )
         # else
       ).then(( results )->
         #export class educators to Salesforce
+        console.log "Exporting class educators"
         return toSalesforce.exportClassEducators( classDoc.educators, classDoc.facility_salesforce_id, classDoc.attendance_report_salesforce_id )
       ).then(( results )->
         #delete necessary educator records
+        console.log "Deleting class educators"
         classDoc.educators = results.educators
         if results.errors
+          console.log "Errors exporting class educators"
+          console.log results.errors
           classDoc.errors = classDoc.errors.concat results.errors
         id = classDoc.attendance_report_salesforce_id
         Classes.update { attendance_report_salesforce_id: id }, { $set: classDoc }
@@ -100,12 +112,17 @@ if Meteor.isServer
       ).then(( deleteResults )->
         #upsert attendee records in Salesforce
         if deleteResults.errors
+          console.log "Errors deleting class educators"
+          console.log deleteResults.errors
           classDoc.errors = classDoc.errors.concat deleteResults.errors
+        console.log "Upserting attendees"
         return toSalesforce.upsertAttendees(classDoc, classDoc.attendees)
       ).then( (results)->
         #delete necessary attendee records
         classDoc.attendees = results.attendees
         if results.errors
+          console.log "Errors upserting attendees"
+          console.log results.errors
           classDoc.errors = classDoc.errors.concat results.errors
         id = classDoc.attendance_report_salesforce_id
         Classes.update { attendance_report_salesforce_id: id }, { $set: classDoc }
@@ -116,11 +133,15 @@ if Meteor.isServer
             return id? and id != ''
           ).map (attendee) ->
             return attendee.contact_salesforce_id
+        console.log "Deleting attendees"
         return toSalesforce.deleteRecords(toDelete, "Contact")
       ).then( (results)->
         #return results and errors to the client
         if results.errors
+          console.log "Errors deleting attendees"
+          console.log results.errors
           classDoc.errors = classDoc.errors.concat results.errors
+        console.log "Returning to client"
         return { doc: classDoc, syncErrors: classDoc.errors }
       , (err)->
         throw err
@@ -148,9 +169,9 @@ if Meteor.isServer
         UniqueID.update { name: initials }, { $inc:{ currentUniqueID: 1 }}
         return initials + moment(classDoc.date).format("YYMMDD") + id
 
-      for attendee in classDoc.attendees
+      for attendee, i in classDoc.attendees
         if not attendee.patient_id or attendee.patient_id == ''
-          attendee.patient_id = getUniqueId classDoc
+          classDoc.attendees[i].patient_id = getUniqueId classDoc
 
       return classDoc
 
