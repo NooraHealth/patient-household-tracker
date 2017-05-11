@@ -10,20 +10,5 @@ require '../imports/api/immutables/NooraClass.coffee';
 moment = require 'moment'
 
 Meteor.startup ()->
-  console.log "Gettting results"
-  results = Classes.aggregate(
-    { $match: { name: { "$exists": true }} },
-    { $group: {
-      _id: '$name',
-      ids: {$push: "$_id" },
-      salesforce_ids: {$push: "$attendance_report_salesforce_id"}}
-    })
-  for result in results
-    if result.salesforce_ids.length > 1
-      console.log result
-
-
-  sInterface = new SalesforceInterface()
-  # sInterface.removeClassesDeletedFromSalesforce()
 
   console.log process.env.MONGO_URL
