@@ -93,13 +93,18 @@ class SalesforceInterface
           resolve( { attendees: updatedAttendees, errors: errors } )
 
       i = 0
-      upsertNextAttendee = ->
+      upsertNextAttendee = (contacts)->
+        console.log "THE CONTACTS"
+        console.log contacts
+        console.log i
+        console.log contacts[i]
         Salesforce.sobject("Contact").upsert contacts[i], "Patient_Id__c", callback.bind(this, attendees[i] )
         i = ++i
         if i is contacts.length
+          console.log "About to clear the interval"
           Meteor.clearInterval(this.handle)
 
-      this.handle = Meteor.setInterval(upsertNextAttendee.bind(this), 500)
+      this.handle = Meteor.setInterval(upsertNextAttendee.bind(this, contacts), 500)
 
 
   deleteRecords: (ids, objectName )->
@@ -152,5 +157,30 @@ class SalesforceInterface
         Salesforce.sobject("Attendance_Report__c").update salesforceObj, "Id", callback
       else
         Salesforce.sobject("Attendance_Report__c").insert salesforceObj, callback
+
+  documentExists: ( objectName, recordId )->
+    query = "SELECT
+      Id FROM #{objectName}
+      WHERE Id = '#{recordId}'"
+    result = Salesforce.query query
+    return result?.response?.records.length == 1
+
+  removeClassesDeletedFromSalesforce: ()->
+    results = Classes.find({}).fetch()
+    # for result in results[0..1]
+    console.log results.length
+    removed = []
+    for result in results
+      id = result.attendance_report_salesforce_id
+      console.log "checking #{id} to see if it exists in salesforce...."
+      if id and id != "" and not @.documentExists("Attendance_Report__c", id)
+          console.log "Should remove this doc"
+          console.log id
+          doc = Classes.findOne { attendance_report_salesforce_id : id }
+          Classes.remove { attendance_report_salesforce_id : id }
+          removed.push( doc )
+
+    console.log "The removed"
+    console.log removed
 
 module.exports.SalesforceInterface = SalesforceInterface
