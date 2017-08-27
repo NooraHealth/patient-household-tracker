@@ -124,23 +124,23 @@ var AddClassPage = React.createClass({
           <div className="fields">
             <Form.Input
               type='number'
-              key= 'total_patients'
-              label= 'Total Patients'
+              key= 'total_people_trained'
+              label= 'Total People Trained'
               type= 'number'
               required= { true }
-              placeholder="Total Patients"
-              value={ this.state.nooraClass.total_patients }
-              onChange={ this._handleChange("total_patients") }
+              placeholder="Total People"
+              value={ this.state.nooraClass.total_people_trained }
+              onChange={ this._handleChange("total_people_trained") }
             />
             <Form.Input
               type='number'
-              key= 'total_family_members'
-              label= 'Total Family Members'
+              key= 'number_families_trained'
+              label= 'Number Families Trained'
               type= 'number'
               required= { true }
-              placeholder="Total Family Members"
-              value={ this.state.nooraClass.total_family_members }
-              onChange={ this._handleChange("total_family_members") }
+              placeholder="Number Families Trained"
+              value={ this.state.nooraClass.number_families_trained }
+              onChange={ this._handleChange("number_families_trained") }
             />
             <Form.Dropdown
               key="majority_language"

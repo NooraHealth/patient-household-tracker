@@ -20,9 +20,9 @@ ClassesSchema = new SimpleSchema
   majority_language:
     type: String
     optional: true
-  total_patients:
+  total_people_trained:
     type: Number
-  total_family_members:
+  number_families_trained:
     type: Number
   condition_operation_salesforce_id:
     type: String

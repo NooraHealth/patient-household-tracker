@@ -10,5 +10,4 @@ require '../imports/api/immutables/NooraClass.coffee';
 moment = require 'moment'
 
 Meteor.startup ()->
-
   console.log process.env.MONGO_URL

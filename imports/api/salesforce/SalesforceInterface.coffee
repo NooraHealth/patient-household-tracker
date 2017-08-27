@@ -81,8 +81,6 @@ class SalesforceInterface
       errors = []
       callback = Meteor.bindEnvironment ( attendee, err, ret ) ->
         if err
-          console.log "ERROR"
-          console.log err
           errors.push { "Error exporting class attendee": err.name }
         else
           attendee.export_error = null
@@ -94,10 +92,6 @@ class SalesforceInterface
 
       i = 0
       upsertNextAttendee = (contacts)->
-        console.log "THE CONTACTS"
-        console.log contacts
-        console.log i
-        console.log contacts[i]
         Salesforce.sobject("Contact").upsert contacts[i], "Patient_Id__c", callback.bind(this, attendees[i] )
         i = ++i
         if i is contacts.length
@@ -138,8 +132,8 @@ class SalesforceInterface
         "Name": nooraClass.name
         "Condition_Operation__c": nooraClass.condition_operation_salesforce_id
         "Location__c": nooraClass.location
-        "Num_Family_Members_Attended_Class__c": nooraClass.total_family_members
-        "Num_Patients_Attended_Class__c": nooraClass.total_patients
+        "Num_Families_Trained__c": nooraClass.number_families_trained
+        "Total_People_Trained__c": nooraClass.total_people_trained
         "Start_DateTime__c": getDateTime(nooraClass.date, nooraClass.start_time, "Asia/Kolkata")
         "End_DateTime__c": endTime
       }
@@ -168,19 +162,12 @@ class SalesforceInterface
   removeClassesDeletedFromSalesforce: ()->
     results = Classes.find({}).fetch()
     # for result in results[0..1]
-    console.log results.length
     removed = []
     for result in results
       id = result.attendance_report_salesforce_id
-      console.log "checking #{id} to see if it exists in salesforce...."
       if id and id != "" and not @.documentExists("Attendance_Report__c", id)
-          console.log "Should remove this doc"
-          console.log id
           doc = Classes.findOne { attendance_report_salesforce_id : id }
           Classes.remove { attendance_report_salesforce_id : id }
           removed.push( doc )
-
-    console.log "The removed"
-    console.log removed
 
 module.exports.SalesforceInterface = SalesforceInterface
