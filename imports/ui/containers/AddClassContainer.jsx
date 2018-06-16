@@ -39,6 +39,7 @@ export default AddClassContainer = createContainer(( params ) => {
   };
 
   _getClassLocations = function( classes ) {
+    console.log(classes);
     const locations = classes.map( function( nooraClass ) {
       return nooraClass.location;
     });
@@ -53,7 +54,7 @@ export default AddClassContainer = createContainer(( params ) => {
 
   return {
     loading: !(educators_handle.ready() && classes_handle.ready()) ,
-    locations: _getClassLocations( Classes.find({ facility_name: AppConfig.getFacilityName() }).fetch() ),
+    locations: _getClassLocations( Classes.find({facility_name: AppConfig.getFacilityName(), date_created: {$gte: "2018-06-10T04:43:17.611Z"}}).fetch() ),
     classDoc: _getClass(params.reportId),
     supportedLanguages: AppConfig.getSupportedLanguages(),
     availableEducators: _getAvailableEducators( AppConfig.getFacilityName() ),
