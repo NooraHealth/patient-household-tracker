@@ -17,9 +17,6 @@ export default AddClassContainer = createContainer(( params ) => {
   };
 
   _getConditionOperations = function( facilityName ) {
-    console.log("facilityName");
-    console.log(facilityName);
-    console.log(ConditionOperations.find({ facility_name: facilityName }).fetch());
     return ConditionOperations.find({ facility_name: facilityName }).fetch();
   };
 
@@ -39,7 +36,6 @@ export default AddClassContainer = createContainer(( params ) => {
   };
 
   _getClassLocations = function( classes ) {
-    console.log(classes);
     const locations = classes.map( function( nooraClass ) {
       return nooraClass.location;
     });
